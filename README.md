@@ -5,3 +5,6 @@ Set up an environment using **conda**:
 
 Activate the environment with:
 `conda activate <env>`
+
+Run the visualisation with:
+`solara run app.py`
