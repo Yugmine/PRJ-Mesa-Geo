@@ -2,7 +2,7 @@
 import mesa
 import osmnx as ox
 import mesa_geo as mg
-from src.agents import Person, Road, ResidentialArea, RetailArea, IndustrialArea
+from .agents import Person, Road, ResidentialArea, RetailArea, IndustrialArea
 
 class TransportModel(mesa.Model):
     """The core model class"""

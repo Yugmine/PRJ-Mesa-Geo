@@ -1,9 +1,9 @@
 """Solara visualization of the model"""
 import solara
-from src.model import TransportModel
-from src.agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
-from custom_geospace_component import make_geospace_component
-from custom_solara_viz import SolaraViz
+from transport_model.model import TransportModel
+from transport_model.agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from utils.custom_geospace_component import make_geospace_component
+from utils.custom_solara_viz import SolaraViz
 
 def draw(agent):
     """Defines how a given agent should be represented"""
