@@ -4,12 +4,18 @@ import os
 import mesa
 import mesa_geo as mg
 import geopandas
+import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
+from networkx import MultiDiGraph
 from .agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 
 class TransportModel(mesa.Model):
     """The core model class"""
     CRS = "EPSG:4326"
+    scenario_path: str
+    space: mg.GeoSpace
+    network: MultiDiGraph
+    selected_agent: mg.GeoAgent
 
     def __init__(self, scenario: str) -> None:
         """
@@ -24,6 +30,7 @@ class TransportModel(mesa.Model):
         self.space = mg.GeoSpace(crs=self.CRS, warn_crs_conversion=False)
 
         self._load_road_network()
+        self._create_road_agents()
         self._load_people()
         self._load_areas()
 
@@ -31,10 +38,14 @@ class TransportModel(mesa.Model):
 
     def _load_road_network(self) -> None:
         """Loads road network from file in the scenario"""
-        network_path = os.path.join(self.scenario_path, "network.geojson")
-        gdf = geopandas.read_file(network_path)
+        network_path = os.path.join(self.scenario_path, "network.graphml")
+        self.network = ox.io.load_graphml(network_path)
+
+    def _create_road_agents(self) -> None:
+        """Creates road agents from saved road network"""
+        gdfs = ox.convert.graph_to_gdfs(self.network) # tuple w/ format (nodes, edges)
         road_creator = mg.AgentCreator(Road, model=self)
-        roads = road_creator.from_GeoDataFrame(gdf)
+        roads = road_creator.from_GeoDataFrame(gdfs[1])
         self.space.add_agents(roads)
 
     def _load_people(self) -> None:
@@ -46,12 +57,13 @@ class TransportModel(mesa.Model):
         for agent in root.findall("agent"):
             latitude = float(agent.find("home_lat").text)
             longitude = float(agent.find("home_long").text)
-            attrs = {
-                "name": agent.find("name").text,
-                "home": (longitude, latitude),
-                "description": agent.find("description").text
-            }
-            new_agent = Person(self, attrs["home"], self.CRS)
+            new_agent = Person(
+                model = self,
+                crs = self.CRS,
+                name = agent.find("name").text,
+                home = (longitude, latitude),
+                description = agent.find("description").text
+            )
             self.space.add_agents(new_agent)
 
     def _load_area_type(self, areas: GeoDataFrame, area_class: type[Area], landuse: str) -> None:

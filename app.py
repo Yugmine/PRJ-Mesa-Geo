@@ -29,7 +29,7 @@ def selected_agent_text(model: mesa.Model) -> solara.Text:
     """Text showing which agent has been clicked on to select it"""
     if model.selected_agent is None:
         return solara.Text("No agent selected")
-    return solara.Text(f"Selected agent: {model.selected_agent.unique_id}")
+    return solara.Text(f"Selected agent: {model.selected_agent.name}")
 
 model_params = {
     "scenario": "ton_test"

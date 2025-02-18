@@ -17,9 +17,8 @@ def create_road_network() -> None:
         dist=LOCATION["radius"],
         network_type="drive"
     )
-    gdfs = ox.convert.graph_to_gdfs(graph) # tuple w/ format (nodes, edges)
-    out_path = os.path.join(DIRECTORY, "network.geojson")
-    gdfs[1].to_file(out_path, driver="GeoJSON")
+    out_path = os.path.join(DIRECTORY, "network.graphml")
+    ox.io.save_graphml(graph, out_path)
 
 def get_areas(landuses: list[str]) -> None:
     """Fetches areas of the specified type"""

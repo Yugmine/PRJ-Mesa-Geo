@@ -6,12 +6,27 @@ from shapely import Point, Polygon
 
 class Person(mg.GeoAgent):
     """Represents one person"""
-    def __init__(self, model: mesa.Model, pos: tuple[float, float], crs: str) -> None:
-        geometry = Point(pos)
+    name: str
+    home: tuple[float, float]
+    description: str
+
+    def __init__(
+        self,
+        model: mesa.Model,
+        crs: str,
+        name: str,
+        home: tuple[float, float],
+        description: str
+    ) -> None:
+        geometry = Point(home)
         super().__init__(model, geometry, crs)
 
+        self.name = name
+        self.home = home
+        self.description = description
+
     def __repr__(self) -> str:
-        return f"Agent {self.unique_id}"
+        return f"Agent {self.name}"
 
     def step(self) -> None:
         pass
