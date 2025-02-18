@@ -28,21 +28,13 @@ def selected_agent_text(model):
     """Text showing which agent has been clicked on to select it"""
     if model.selected_agent is None:
         return solara.Text("No agent selected")
-    else:
-        return solara.Text(f"Selected agent: {model.selected_agent.unique_id}")
+    return solara.Text(f"Selected agent: {model.selected_agent.unique_id}")
 
 model_params = {
-    "num_agents": {
-        "type": "SliderInt",
-        "value": 10,
-        "label": "Number of agents:",
-        "min": 1,
-        "max": 100,
-        "step": 1,
-    },
+    "scenario": "ton_test"
 }
 
-transport_model = TransportModel()
+transport_model = TransportModel(model_params["scenario"])
 
 page = SolaraViz(
     transport_model,
