@@ -4,13 +4,14 @@ import os
 import mesa
 import mesa_geo as mg
 import geopandas
-from .agents import Person, Road, ResidentialArea, RetailArea, IndustrialArea
+from geopandas.geodataframe import GeoDataFrame
+from .agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 
 class TransportModel(mesa.Model):
     """The core model class"""
     CRS = "EPSG:4326"
 
-    def __init__(self, scenario):
+    def __init__(self, scenario: str) -> None:
         """
         Constructor for the model
 
@@ -28,7 +29,7 @@ class TransportModel(mesa.Model):
 
         self.selected_agent = None
 
-    def _load_road_network(self):
+    def _load_road_network(self) -> None:
         """Loads road network from file in the scenario"""
         network_path = os.path.join(self.scenario_path, "network.geojson")
         gdf = geopandas.read_file(network_path)
@@ -36,7 +37,7 @@ class TransportModel(mesa.Model):
         roads = road_creator.from_GeoDataFrame(gdf)
         self.space.add_agents(roads)
 
-    def _load_people(self):
+    def _load_people(self) -> None:
         """Loads person agents from file in the scenario"""
         agents_path = os.path.join(self.scenario_path, "agents.xml")
         xml_tree = ET.parse(agents_path)
@@ -53,14 +54,14 @@ class TransportModel(mesa.Model):
             new_agent = Person(self, attrs["home"], self.CRS)
             self.space.add_agents(new_agent)
 
-    def _load_area_type(self, areas, area_class, landuse):
+    def _load_area_type(self, areas: GeoDataFrame, area_class: type[Area], landuse: str) -> None:
         """"Creates agents for the specicfied area class and landuse"""
         areas_of_type = areas.loc[areas["landuse"] == landuse]
         area_creator = mg.AgentCreator(area_class, model=self)
         agents = area_creator.from_GeoDataFrame(areas_of_type)
         self.space.add_agents(agents)
 
-    def _load_areas(self):
+    def _load_areas(self) -> None:
         """Loads areas (residential, retail, etc...) from file in the scenario"""
         areas_path = os.path.join(self.scenario_path, "areas.geojson")
         areas = geopandas.read_file(areas_path)
@@ -68,7 +69,7 @@ class TransportModel(mesa.Model):
         self._load_area_type(areas, RetailArea, "retail")
         self._load_area_type(areas, IndustrialArea, "industrial")
 
-    def step(self):
+    def step(self) -> None:
         self.agents_by_type[Person].shuffle_do("step")
 
 # look into partially abstracting out households by having one super-agent represent each household

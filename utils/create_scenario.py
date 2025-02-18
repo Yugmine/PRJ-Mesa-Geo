@@ -10,7 +10,7 @@ LOCATION = {
     "radius": 3000
 }
 
-def create_road_network():
+def create_road_network() -> None:
     """Fetches road network for specified location and writes it to disk"""
     graph = ox.graph_from_address(
         LOCATION["centre"],
@@ -21,7 +21,7 @@ def create_road_network():
     out_path = os.path.join(DIRECTORY, "network.geojson")
     gdfs[1].to_file(out_path, driver="GeoJSON")
 
-def get_areas(landuses):
+def get_areas(landuses: list[str]) -> None:
     """Fetches areas of the specified type"""
     gdf_list = []
     for landuse in landuses:
@@ -33,7 +33,7 @@ def get_areas(landuses):
         gdf_list.append(areas)
     return gdf_list
 
-def create_areas_of_types(landuses):
+def create_areas_of_types(landuses: list[str]) -> None:
     """Fetches areas of the specified type and writes them to disk"""
     gdf_list = get_areas(landuses)
     combined_areas = pd.concat(gdf_list, ignore_index=True)

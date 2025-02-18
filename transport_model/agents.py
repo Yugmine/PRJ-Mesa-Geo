@@ -6,14 +6,14 @@ from shapely import Point, Polygon
 
 class Person(mg.GeoAgent):
     """Represents one person"""
-    def __init__(self, model, pos, crs):
+    def __init__(self, model: mesa.Model, pos: tuple[float, float], crs: str) -> None:
         geometry = Point(pos)
         super().__init__(model, geometry, crs)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Agent {self.unique_id}"
 
-    def step(self):
+    def step(self) -> None:
         pass
 
 class Road(mg.GeoAgent):
@@ -28,7 +28,8 @@ class Area(mg.GeoAgent):
     model: mesa.Model
     geometry: Polygon
 
-    def get_random_point(self):
+    # NOTE: currently unused
+    def get_random_point(self) -> Point:
         """Returns a random point within this area"""
         min_x, min_y, max_x, max_y = self.geometry.bounds
         point = None
