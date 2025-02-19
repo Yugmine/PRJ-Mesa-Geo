@@ -7,7 +7,7 @@ from shapely import Point, Polygon
 class Person(mg.GeoAgent):
     """Represents one person"""
     name: str
-    home: tuple[float, float]
+    home: int
     description: str
 
     def __init__(
@@ -15,10 +15,10 @@ class Person(mg.GeoAgent):
         model: mesa.Model,
         crs: str,
         name: str,
-        home: tuple[float, float],
+        home: int,
         description: str
     ) -> None:
-        geometry = Point(home)
+        geometry = Point(model.get_location_coords(home))
         super().__init__(model, geometry, crs)
 
         self.name = name
@@ -29,8 +29,9 @@ class Person(mg.GeoAgent):
         return f"Agent {self.name}"
 
     def step(self) -> None:
-        nearest_node = self.model.get_nearest_node(self.geometry)
-        self.geometry = Point(self.model.network.nodes[nearest_node]["x"], self.model.network.nodes[nearest_node]["y"])
+        # temporary test that moves the agent to its nearest node in the driving network
+        nearest_node = self.model.drive_network.get_nearest_node(self.geometry)
+        self.geometry = Point(self.model.drive_network.get_node_coords(nearest_node))
 
 class NetworkLink(mg.GeoAgent):
     """A transport link between two points (e.g. a road)"""
@@ -41,9 +42,11 @@ class NetworkLink(mg.GeoAgent):
 class Road(NetworkLink):
     """A road for cars"""
 
+# NOTE: currently unused
 class Walkway(NetworkLink):
     """A path for pedestrians"""
 
+# NOTE: currently unused
 class Cycleway(NetworkLink):
     """A route for cyclists"""
 

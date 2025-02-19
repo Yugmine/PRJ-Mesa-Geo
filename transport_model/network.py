@@ -22,6 +22,11 @@ class TransportNetwork():
         node_id = list(self.graph.nodes)[node_index[0,0]]
         return node_id
 
+    # NOTE: may be unnecessary in future
+    def get_node_coords(self, node_id: int) -> tuple[float, float]:
+        """Gets the coordinates of the specified node"""
+        return self.graph.nodes[node_id]["x"], self.graph.nodes[node_id]["y"]
+
     def get_edges_as_gdf(self) -> GeoDataFrame:
         """Returns a gdf with the edges of this network's graph"""
         gdfs = ox.convert.graph_to_gdfs(self.graph) # tuple w/ format (nodes, edges)

@@ -25,14 +25,26 @@ def draw(agent: mesa.Agent) -> dict:
 
     return portrayal
 
-def selected_agent_text(model: mesa.Model) -> solara.Text:
+def selected_agent_text(model: TransportModel) -> solara.Text:
     """Text showing which agent has been clicked on to select it"""
     if model.selected_agent is None:
         return solara.Text("No agent selected")
     return solara.Text(f"Selected agent: {model.selected_agent.name}")
 
+def clock_text(model: TransportModel) -> solara.Text:
+    """Text showing the current simulated time"""
+    return solara.Text(f"Day: {model.day} {model.hour:02d}:{model.minute:02d}")
+
 model_params = {
-    "scenario": "ton_test"
+    "scenario": "ton_test",
+    "time_step": {
+        "type": "SliderInt",
+        "value": 15,
+        "label": "Minutes per step:",
+        "min": 5,
+        "max": 60,
+        "step": 5,
+    },
 }
 
 transport_model = TransportModel(model_params["scenario"])
@@ -43,7 +55,8 @@ page = SolaraViz(
     model_params=model_params,
     components=[
         make_geospace_component(draw),
-        selected_agent_text
+        selected_agent_text,
+        clock_text
     ],
 )
 # This is required to render the visualization in the Jupyter notebook
