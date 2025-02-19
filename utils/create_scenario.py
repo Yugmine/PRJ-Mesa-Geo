@@ -10,15 +10,15 @@ LOCATION = {
     "radius": 3000
 }
 
-def create_road_network() -> None:
-    """Fetches road network for specified location and writes it to disk"""
+def create_network_of_type(network_type: str) -> None:
+    """Fetches network of given type for specified location and writes it to disk"""
     # TODO: ensure graph is fully connected?
     graph = ox.graph_from_address(
         LOCATION["centre"],
         dist=LOCATION["radius"],
-        network_type="drive"
+        network_type=network_type
     )
-    out_path = os.path.join(DIRECTORY, "network.graphml")
+    out_path = os.path.join(DIRECTORY, f"network_{network_type}.graphml")
     ox.io.save_graphml(graph, out_path)
 
 def get_areas(landuses: list[str]) -> None:
@@ -41,5 +41,7 @@ def create_areas_of_types(landuses: list[str]) -> None:
     combined_areas.to_file(out_path, driver="GeoJSON")
 
 if __name__ == "__main__":
-    create_road_network()
+    create_network_of_type("drive")
+    create_network_of_type("walk")
+    create_network_of_type("bike")
     create_areas_of_types(["residential", "retail", "industrial"])

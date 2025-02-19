@@ -7,17 +7,17 @@ import geopandas
 import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
-from sklearn.neighbors import KDTree
-from shapely import Point
-from .agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from .agents import Person, NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
 
 class TransportModel(mesa.Model):
     """The core model class"""
     CRS = "EPSG:4326"
     scenario_path: str
     space: mg.GeoSpace
-    network: MultiDiGraph
-    kd_tree: KDTree
+    drive_network: DriveNetwork
+    walk_network: WalkNetwork
+    bike_network: BikeNetwork
     selected_agent: mg.GeoAgent
 
     def __init__(self, scenario: str) -> None:
@@ -32,25 +32,26 @@ class TransportModel(mesa.Model):
 
         self.space = mg.GeoSpace(crs=self.CRS, warn_crs_conversion=False)
 
-        self._load_road_network()
-        self._create_road_agents()
+        self.drive_network = DriveNetwork(self._get_network("drive"))
+        self.walk_network = WalkNetwork(self._get_network("walk"))
+        self.bike_network = BikeNetwork(self._get_network("bike"))
+
+        self._create_link_agents(Road, self.drive_network)
+
         self._load_people()
         self._load_areas()
-        node_positions = [(node[1]["x"], node[1]["y"]) for node in self.network.nodes.data()]
-        self.kd_tree = KDTree(node_positions)
         self.selected_agent = None
 
-    def _load_road_network(self) -> None:
-        """Loads road network from file in the scenario"""
-        network_path = os.path.join(self.scenario_path, "network.graphml")
-        self.network = ox.io.load_graphml(network_path)
+    def _get_network(self, network_type: str) -> MultiDiGraph:
+        """Loads network from file in the scenario"""
+        network_path = os.path.join(self.scenario_path, f"network_{network_type}.graphml")
+        return ox.io.load_graphml(network_path)
 
-    def _create_road_agents(self) -> None:
-        """Creates road agents from saved road network"""
-        gdfs = ox.convert.graph_to_gdfs(self.network) # tuple w/ format (nodes, edges)
-        road_creator = mg.AgentCreator(Road, model=self)
-        roads = road_creator.from_GeoDataFrame(gdfs[1])
-        self.space.add_agents(roads)
+    def _create_link_agents(self, link_class: type[NetworkLink], network: TransportNetwork) -> None:
+        """Creates network link agents from provided network"""
+        link_creator = mg.AgentCreator(link_class, model=self)
+        links = link_creator.from_GeoDataFrame(network.get_edges_as_gdf())
+        self.space.add_agents(links)
 
     def _load_people(self) -> None:
         """Loads person agents from file in the scenario"""
@@ -84,15 +85,6 @@ class TransportModel(mesa.Model):
         self._load_area_type(areas, ResidentialArea, "residential")
         self._load_area_type(areas, RetailArea, "retail")
         self._load_area_type(areas, IndustrialArea, "industrial")
-
-    def get_nearest_node(self, pos: Point) -> int:
-        """
-        Gets the id of the nearest node in the road network to the provided point
-        Code taken from agents_and_networks mesa_geo example
-        """
-        node_index = self.kd_tree.query([(pos.x, pos.y)], k=1, return_distance=False)
-        node_id = list(self.network.nodes)[node_index[0,0]]
-        return node_id
 
     def step(self) -> None:
         self.agents_by_type[Person].shuffle_do("step")

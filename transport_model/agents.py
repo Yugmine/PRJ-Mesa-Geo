@@ -32,11 +32,20 @@ class Person(mg.GeoAgent):
         nearest_node = self.model.get_nearest_node(self.geometry)
         self.geometry = Point(self.model.network.nodes[nearest_node]["x"], self.model.network.nodes[nearest_node]["y"])
 
-class Road(mg.GeoAgent):
-    """A road that links two points"""
+class NetworkLink(mg.GeoAgent):
+    """A transport link between two points (e.g. a road)"""
     unique_id: int
     model: mesa.Model
     geometry: Point
+
+class Road(NetworkLink):
+    """A road for cars"""
+
+class Walkway(NetworkLink):
+    """A path for pedestrians"""
+
+class Cycleway(NetworkLink):
+    """A route for cyclists"""
 
 class Area(mg.GeoAgent):
     """Represents an OSM area"""

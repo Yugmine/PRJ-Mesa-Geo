@@ -6496,8 +6496,8 @@
       <data key="d8">[1115320553, 4689080, 4689081, 1125626362, 1125626363]</data>
       <data key="d18">yes</data>
       <data key="d9">trunk_link</data>
-      <data key="d10">['1', '2']</data>
-      <data key="d17">['70 mph', '30 mph']</data>
+      <data key="d10">['2', '1']</data>
+      <data key="d17">['30 mph', '70 mph']</data>
       <data key="d13">True</data>
       <data key="d14">False</data>
       <data key="d15">356.37702891991967</data>
@@ -7614,7 +7614,7 @@
       <data key="d8">[1099472152, 889339604, 26692277]</data>
       <data key="d9">trunk</data>
       <data key="d10">2</data>
-      <data key="d17">['40 mph', '60 mph']</data>
+      <data key="d17">['60 mph', '40 mph']</data>
       <data key="d11">Woodgate Way</data>
       <data key="d12">A26</data>
       <data key="d13">False</data>
@@ -7781,7 +7781,7 @@
       <data key="d9">secondary</data>
       <data key="d10">2</data>
       <data key="d17">30 mph</data>
-      <data key="d11">['London Road', 'Tonbridge Road']</data>
+      <data key="d11">['Tonbridge Road', 'London Road']</data>
       <data key="d12">B245</data>
       <data key="d13">False</data>
       <data key="d14">True</data>
@@ -7971,7 +7971,7 @@
       <data key="d9">tertiary</data>
       <data key="d10">2</data>
       <data key="d17">['20 mph', '30 mph']</data>
-      <data key="d11">['Vale Rise', 'Lodge Oak Lane']</data>
+      <data key="d11">['Lodge Oak Lane', 'Vale Rise']</data>
       <data key="d13">False</data>
       <data key="d14">False</data>
       <data key="d15">186.3913659253538</data>
@@ -8026,7 +8026,7 @@
       <data key="d9">tertiary</data>
       <data key="d10">2</data>
       <data key="d17">['20 mph', '30 mph']</data>
-      <data key="d11">['Vale Rise', 'Lodge Oak Lane']</data>
+      <data key="d11">['Lodge Oak Lane', 'Vale Rise']</data>
       <data key="d13">False</data>
       <data key="d14">True</data>
       <data key="d15">186.39136592535382</data>
@@ -10644,7 +10644,7 @@
       <data key="d8">[4913977, 1099472159]</data>
       <data key="d9">trunk</data>
       <data key="d10">2</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Hadlow Road</data>
       <data key="d12">A26</data>
       <data key="d13">False</data>
@@ -10655,7 +10655,7 @@
     <edge source="32135284" target="32135562" id="0">
       <data key="d8">[1185126337, 1262221441]</data>
       <data key="d9">tertiary</data>
-      <data key="d10">['3', '2']</data>
+      <data key="d10">['2', '3']</data>
       <data key="d17">20 mph</data>
       <data key="d11">The Ridgeway</data>
       <data key="d13">False</data>
@@ -11353,7 +11353,7 @@
     <edge source="32139355" target="32139820" id="0">
       <data key="d8">[1099472162, 4913246]</data>
       <data key="d9">tertiary</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Upper Haysden Lane</data>
       <data key="d13">False</data>
       <data key="d14">False</data>
@@ -11615,7 +11615,7 @@
     <edge source="32139820" target="32139355" id="0">
       <data key="d8">[1099472162, 4913246]</data>
       <data key="d9">tertiary</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Upper Haysden Lane</data>
       <data key="d13">False</data>
       <data key="d14">True</data>
@@ -11644,7 +11644,7 @@
     <edge source="32139827" target="155140378" id="0">
       <data key="d8">[1099472161, 310679826, 95817043, 29410906, 15547544, 95817049, 824158106, 174988155, 29410908]</data>
       <data key="d9">unclassified</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Lower Haysden Lane</data>
       <data key="d13">False</data>
       <data key="d14">True</data>
@@ -12171,7 +12171,7 @@
     <edge source="32140448" target="32140451" id="0">
       <data key="d8">[24280435, 4913277]</data>
       <data key="d9">residential</data>
-      <data key="d11">['Meadow Road', 'Lionel Road']</data>
+      <data key="d11">['Lionel Road', 'Meadow Road']</data>
       <data key="d13">False</data>
       <data key="d14">[False, True]</data>
       <data key="d15">230.159312084517</data>
@@ -12197,7 +12197,7 @@
     <edge source="32140451" target="32140448" id="0">
       <data key="d8">[24280435, 4913277]</data>
       <data key="d9">residential</data>
-      <data key="d11">['Meadow Road', 'Lionel Road']</data>
+      <data key="d11">['Lionel Road', 'Meadow Road']</data>
       <data key="d13">False</data>
       <data key="d14">[False, True]</data>
       <data key="d15">230.159312084517</data>
@@ -12794,7 +12794,7 @@
     <edge source="32144532" target="32144539" id="0">
       <data key="d8">[137812762, 4913631]</data>
       <data key="d9">residential</data>
-      <data key="d11">['Audley Rise', 'Audley Avenue']</data>
+      <data key="d11">['Audley Avenue', 'Audley Rise']</data>
       <data key="d13">False</data>
       <data key="d14">False</data>
       <data key="d15">175.83794930563795</data>
@@ -12838,7 +12838,7 @@
     <edge source="32144539" target="32144532" id="0">
       <data key="d8">[137812762, 4913631]</data>
       <data key="d9">residential</data>
-      <data key="d11">['Audley Rise', 'Audley Avenue']</data>
+      <data key="d11">['Audley Avenue', 'Audley Rise']</data>
       <data key="d13">False</data>
       <data key="d14">True</data>
       <data key="d15">175.83794930563792</data>
@@ -16708,7 +16708,7 @@
     <edge source="32220345" target="32220364" id="0">
       <data key="d8">[1099472154, 183256542]</data>
       <data key="d9">primary</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Shipbourne Road</data>
       <data key="d12">A227</data>
       <data key="d13">False</data>
@@ -16781,7 +16781,7 @@
     <edge source="32220364" target="32220345" id="0">
       <data key="d8">[1099472154, 183256542]</data>
       <data key="d9">primary</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Shipbourne Road</data>
       <data key="d12">A227</data>
       <data key="d13">False</data>
@@ -17387,7 +17387,7 @@
       <data key="d8">[26694883, 130574423]</data>
       <data key="d9">residential</data>
       <data key="d17">20 mph</data>
-      <data key="d11">['Walton Road', 'Stainer Road']</data>
+      <data key="d11">['Stainer Road', 'Walton Road']</data>
       <data key="d13">False</data>
       <data key="d14">False</data>
       <data key="d15">167.12494752904388</data>
@@ -22375,7 +22375,7 @@
       <data key="d9">secondary</data>
       <data key="d10">2</data>
       <data key="d17">30 mph</data>
-      <data key="d11">['London Road', 'Tonbridge Road']</data>
+      <data key="d11">['Tonbridge Road', 'London Road']</data>
       <data key="d12">B245</data>
       <data key="d13">False</data>
       <data key="d14">False</data>
@@ -22485,7 +22485,7 @@
     <edge source="32335189" target="32335193" id="0">
       <data key="d8">[4926035, 4926037]</data>
       <data key="d9">residential</data>
-      <data key="d11">['Hill View Road', 'Hilden Avenue']</data>
+      <data key="d11">['Hilden Avenue', 'Hill View Road']</data>
       <data key="d13">False</data>
       <data key="d14">True</data>
       <data key="d15">197.8759007430248</data>
@@ -22512,7 +22512,7 @@
     <edge source="32335193" target="32335189" id="0">
       <data key="d8">[4926035, 4926037]</data>
       <data key="d9">residential</data>
-      <data key="d11">['Hill View Road', 'Hilden Avenue']</data>
+      <data key="d11">['Hilden Avenue', 'Hill View Road']</data>
       <data key="d13">False</data>
       <data key="d14">False</data>
       <data key="d15">197.8759007430248</data>
@@ -23899,7 +23899,7 @@
       <data key="d8">[106150065, 1099472156]</data>
       <data key="d9">trunk</data>
       <data key="d10">2</data>
-      <data key="d17">['50 mph', '40 mph']</data>
+      <data key="d17">['40 mph', '50 mph']</data>
       <data key="d11">Hadlow Road East</data>
       <data key="d12">A26</data>
       <data key="d13">False</data>
@@ -24154,7 +24154,7 @@
       <data key="d13">False</data>
       <data key="d14">False</data>
       <data key="d15">2365.2383031564514</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d19">yes</data>
       <data key="d16">LINESTRING (0.2377498 51.1809523, 0.2373386 51.1813732, 0.2371327 51.1816907, 0.23727 51.1820135, 0.2370588 51.1822007, 0.2362143 51.1823578, 0.2361503 51.1823826, 0.2358254 51.1825085, 0.2355782 51.1826043, 0.2353422 51.1829271, 0.235192 51.1834247, 0.2351328 51.1837674, 0.2352563 51.1841779, 0.2355448 51.1843431, 0.2359654 51.1845422, 0.2363773 51.1848004, 0.2365662 51.1852362, 0.236549 51.1857688, 0.236534 51.185827, 0.236343 51.1865704, 0.2365233 51.1871998, 0.2366578 51.1875797, 0.2368056 51.187648, 0.2372095 51.1878291, 0.2376059 51.1879762, 0.2377609 51.1880243, 0.2379084 51.1880701, 0.2379436 51.1880811, 0.2381421 51.1881427, 0.238853 51.1883418, 0.2394956 51.1885124, 0.2402178 51.1887171, 0.2410026 51.1889162, 0.2415854 51.1890793, 0.2419502 51.1891643, 0.2423341 51.1892521, 0.2425426 51.1892905, 0.242836 51.1893344, 0.2430198 51.1893399, 0.2433077 51.1893179, 0.2434625 51.1892926, 0.2436433 51.189228, 0.2437854 51.1891247, 0.2438951 51.1890085, 0.2440114 51.1888664, 0.2441018 51.1887663, 0.2441858 51.1887082, 0.2442826 51.1886888, 0.2444247 51.1887049, 0.2446184 51.1887405, 0.2448283 51.1887566, 0.2450737 51.1887663, 0.2454031 51.1888018, 0.2456324 51.1888276, 0.2459456 51.1888373, 0.2462749 51.1888244, 0.2466818 51.1887857, 0.2469242 51.1887645, 0.2471549 51.1887315, 0.2474945 51.1887037, 0.2477582 51.1886901, 0.2479302 51.1886804, 0.2481586 51.1886655, 0.2483419 51.188629, 0.2486864 51.1885639, 0.249318 51.1884485, 0.2501148 51.1883861, 0.2510353 51.1883058, 0.2513854 51.1882302, 0.2517282 51.1881065, 0.2524921 51.1879612, 0.2531616 51.1879343, 0.2538927 51.1879223, 0.2550429 51.1879922, 0.2553732 51.1879984, 0.2557321 51.1880158, 0.2558798 51.1880229, 0.2562193 51.1880306, 0.2565201 51.1880038, 0.2565822 51.1879929, 0.2567742 51.1879592)</data>
     </edge>
@@ -24162,7 +24162,7 @@
       <data key="d8">[4913246, 638229631]</data>
       <data key="d9">tertiary</data>
       <data key="d10">2</data>
-      <data key="d17">['40 mph', '60 mph']</data>
+      <data key="d17">['60 mph', '40 mph']</data>
       <data key="d11">Upper Haysden Lane</data>
       <data key="d13">False</data>
       <data key="d14">True</data>
@@ -24211,7 +24211,7 @@
     <edge source="177550849" target="1272420408" id="0">
       <data key="d8">[122160233, 122160228, 17099924]</data>
       <data key="d9">tertiary</data>
-      <data key="d10">['1', '2']</data>
+      <data key="d10">['2', '1']</data>
       <data key="d17">30 mph</data>
       <data key="d11">Sovereign Way</data>
       <data key="d13">False</data>
@@ -24287,7 +24287,7 @@
       <data key="d8">[106150065, 1099472156]</data>
       <data key="d9">trunk</data>
       <data key="d10">2</data>
-      <data key="d17">['50 mph', '40 mph']</data>
+      <data key="d17">['40 mph', '50 mph']</data>
       <data key="d11">Hadlow Road East</data>
       <data key="d12">A26</data>
       <data key="d13">False</data>
@@ -24369,7 +24369,7 @@
     </edge>
     <edge source="249707157" target="32335485" id="0">
       <data key="d8">[26693880, 8155019, 158452847]</data>
-      <data key="d9">['residential', 'unclassified']</data>
+      <data key="d9">['unclassified', 'residential']</data>
       <data key="d11">Leigh Road</data>
       <data key="d13">False</data>
       <data key="d14">[False, True]</data>
@@ -24577,7 +24577,7 @@
       <data key="d8">[26823769, 1306911691]</data>
       <data key="d9">secondary</data>
       <data key="d10">2</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">London Road</data>
       <data key="d12">B245</data>
       <data key="d13">False</data>
@@ -24709,7 +24709,7 @@
       <data key="d8">[151747913, 4918570]</data>
       <data key="d9">residential</data>
       <data key="d17">20 mph</data>
-      <data key="d11">['Mill Crescent', 'Mill Lane']</data>
+      <data key="d11">['Mill Lane', 'Mill Crescent']</data>
       <data key="d13">True</data>
       <data key="d14">False</data>
       <data key="d15">255.92504909321391</data>
@@ -25780,7 +25780,7 @@
       <data key="d8">[4913977, 1099472159]</data>
       <data key="d9">trunk</data>
       <data key="d10">2</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Hadlow Road</data>
       <data key="d12">A26</data>
       <data key="d13">False</data>
@@ -26349,7 +26349,7 @@
       <data key="d8">[26823769, 1306911691]</data>
       <data key="d9">secondary</data>
       <data key="d10">2</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">London Road</data>
       <data key="d12">B245</data>
       <data key="d13">False</data>
@@ -26611,7 +26611,7 @@
       <data key="d18">yes</data>
       <data key="d9">trunk</data>
       <data key="d10">['2', '1']</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">London Road</data>
       <data key="d13">True</data>
       <data key="d12">A26</data>
@@ -26649,7 +26649,7 @@
       <data key="d18">yes</data>
       <data key="d9">trunk</data>
       <data key="d10">1</data>
-      <data key="d17">['40 mph', '30 mph']</data>
+      <data key="d17">['30 mph', '40 mph']</data>
       <data key="d11">Quarry Hill Road</data>
       <data key="d13">True</data>
       <data key="d12">A26</data>
@@ -26771,7 +26771,7 @@
       <data key="d18">yes</data>
       <data key="d9">trunk</data>
       <data key="d10">2</data>
-      <data key="d17">['40 mph', '60 mph']</data>
+      <data key="d17">['60 mph', '40 mph']</data>
       <data key="d11">Pembury Road</data>
       <data key="d13">False</data>
       <data key="d12">A2014</data>
@@ -27236,7 +27236,7 @@
     </edge>
     <edge source="950284343" target="32221225" id="0">
       <data key="d8">[4918516, 828123290, 828123291, 81526956]</data>
-      <data key="d9">['residential', 'unclassified']</data>
+      <data key="d9">['unclassified', 'residential']</data>
       <data key="d17">20 mph</data>
       <data key="d13">False</data>
       <data key="d14">[False, True]</data>
@@ -33200,7 +33200,7 @@
       <data key="d15">15.799792714819109</data>
       <data key="d16">LINESTRING (0.2792791 51.1922747, 0.2791992 51.1922139, 0.279135 51.192165)</data>
     </edge>
-    <data key="d0">2025-02-18 18:13:20</data>
+    <data key="d0">2025-02-19 17:14:20</data>
     <data key="d1">OSMnx 2.0.1</data>
     <data key="d2">epsg:4326</data>
     <data key="d3">True</data>
