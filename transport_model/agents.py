@@ -29,7 +29,8 @@ class Person(mg.GeoAgent):
         return f"Agent {self.name}"
 
     def step(self) -> None:
-        pass
+        nearest_node = self.model.get_nearest_node(self.geometry)
+        self.geometry = Point(self.model.network.nodes[nearest_node]["x"], self.model.network.nodes[nearest_node]["y"])
 
 class Road(mg.GeoAgent):
     """A road that links two points"""

@@ -7,6 +7,8 @@ import geopandas
 import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
+from sklearn.neighbors import KDTree
+from shapely import Point
 from .agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 
 class TransportModel(mesa.Model):
@@ -15,6 +17,7 @@ class TransportModel(mesa.Model):
     scenario_path: str
     space: mg.GeoSpace
     network: MultiDiGraph
+    kd_tree: KDTree
     selected_agent: mg.GeoAgent
 
     def __init__(self, scenario: str) -> None:
@@ -33,7 +36,8 @@ class TransportModel(mesa.Model):
         self._create_road_agents()
         self._load_people()
         self._load_areas()
-
+        node_positions = [(node[1]["x"], node[1]["y"]) for node in self.network.nodes.data()]
+        self.kd_tree = KDTree(node_positions)
         self.selected_agent = None
 
     def _load_road_network(self) -> None:
@@ -80,6 +84,15 @@ class TransportModel(mesa.Model):
         self._load_area_type(areas, ResidentialArea, "residential")
         self._load_area_type(areas, RetailArea, "retail")
         self._load_area_type(areas, IndustrialArea, "industrial")
+
+    def get_nearest_node(self, pos: Point) -> int:
+        """
+        Gets the id of the nearest node in the road network to the provided point
+        Code taken from agents_and_networks mesa_geo example
+        """
+        node_index = self.kd_tree.query([(pos.x, pos.y)], k=1, return_distance=False)
+        node_id = list(self.network.nodes)[node_index[0,0]]
+        return node_id
 
     def step(self) -> None:
         self.agents_by_type[Person].shuffle_do("step")

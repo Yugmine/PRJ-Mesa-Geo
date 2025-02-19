@@ -12,6 +12,7 @@ LOCATION = {
 
 def create_road_network() -> None:
     """Fetches road network for specified location and writes it to disk"""
+    # TODO: ensure graph is fully connected?
     graph = ox.graph_from_address(
         LOCATION["centre"],
         dist=LOCATION["radius"],
