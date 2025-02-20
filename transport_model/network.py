@@ -3,8 +3,8 @@ from typing import override
 import osmnx as ox
 import networkx as nx
 from sklearn.neighbors import KDTree
-from shapely import Point
 from geopandas import GeoDataFrame
+from shapely import LineString
 
 class TransportNetwork():
     """Represents a transport network"""
@@ -16,13 +16,12 @@ class TransportNetwork():
         node_positions = [(node[1]["x"], node[1]["y"]) for node in self.graph.nodes.data()]
         self.kd_tree = KDTree(node_positions)
 
-    def get_nearest_node(self, pos: Point) -> int:
+    def get_nearest_node(self, coords: tuple[float, float]) -> int:
         """Gets the id of the nearest node in the road network to the provided point"""
-        node_index = self.kd_tree.query([(pos.x, pos.y)], k=1, return_distance=False)
+        node_index = self.kd_tree.query([coords], k=1, return_distance=False)
         node_id = list(self.graph.nodes)[node_index[0,0]]
         return node_id
 
-    # NOTE: may be unnecessary in future
     def get_node_coords(self, node_id: int) -> tuple[float, float]:
         """Gets the coordinates of the specified node"""
         return self.graph.nodes[node_id]["x"], self.graph.nodes[node_id]["y"]
@@ -35,6 +34,62 @@ class TransportNetwork():
     def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
         """Plans a route from the source node to the target node"""
         return nx.astar_path(self.graph, source, target, weight="length")
+
+    def get_path_length(self, path: list[int]) -> float:
+        """Gets the length of the provided path"""
+        return nx.path_weight(self.graph, path, "length")
+
+    def _get_final_edge(self, path: list[int], dist: float) -> tuple[int, int, float]:
+        """
+        Gets which edge we'll end up on after moving the provided distance,
+        and how far along it we are.
+        """
+        cumulative_length = 0
+        for i in range(len(path) - 1):
+            edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            if cumulative_length + edge_data["length"] > dist:
+                dist_along_edge = dist - cumulative_length
+                return path[i], path[i + 1], dist_along_edge
+            cumulative_length += edge_data["length"]
+        return None
+
+    def _trim_path_to_node(self, path: list[int], node: int) -> list[int]:
+        """Creates a new path without any nodes before the given node"""
+        index = path.index(node)
+        return path[index:]
+
+    def _create_line(self, start: int, end: int) -> LineString:
+        """Creates a Shapely LineString between the provided nodes"""
+        start_pos = self.get_node_coords(start)
+        end_pos = self.get_node_coords(end)
+        return LineString([start_pos, end_pos])
+
+    def traverse_path(self, path: list[int], dist: float) -> tuple[list[int], float, tuple[float, float]]:
+        """
+        Traverses the provided path by the specified distance.
+        Callers should verify that dist < path length.
+
+        Returns:
+        - Remaining path
+        - Path offset
+        - New location
+        """
+        edge_u, edge_v, offset = self._get_final_edge(path, dist)
+        new_path = self._trim_path_to_node(path, edge_u)
+        edge_data = self.graph.get_edge_data(edge_u, edge_v)[0]
+
+        if "geometry" in edge_data:
+            geometry = edge_data["geometry"]
+        else:
+            geometry = self._create_line(edge_u, edge_v)
+        new_point = geometry.interpolate(offset)
+        new_location = (new_point.x, new_point.y)
+        return new_path, offset, new_location
+        
+# potentially make agents disappear when they're not moving (do this later)
+
+# for car need to check distance for each edge individually (because of different speed limits)
+
 
 class DriveNetwork(TransportNetwork):
     """

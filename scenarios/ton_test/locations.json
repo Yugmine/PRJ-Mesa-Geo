@@ -16,5 +16,11 @@
         "lat": 51.20786298658563,
         "long": 0.2936972978196854,
         "description": "Home of Charlie"
+    },
+    {
+        "name": "Tonbridge Station",
+        "lat": 51.191465,
+        "long": 0.270486,
+        "description": "Train station with frequent trains to London and surrounding towns"
     }
 ]

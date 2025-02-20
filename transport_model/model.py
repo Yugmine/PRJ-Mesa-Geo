@@ -19,7 +19,7 @@ class TransportModel(mesa.Model):
     drive_network: DriveNetwork
     walk_network: WalkNetwork
     bike_network: BikeNetwork
-    selected_agent: mg.GeoAgent
+    selected_agent: Person
     day: int
     hour: int
     minute: int
@@ -35,6 +35,10 @@ class TransportModel(mesa.Model):
         super().__init__()
 
         self.scenario_path = os.path.join("./scenarios", scenario)
+        self.day = 0
+        self.hour = 0
+        self.minute = 0
+        self.time_step = time_step
 
         self.space = mg.GeoSpace(crs=self.CRS, warn_crs_conversion=False)
 
@@ -48,11 +52,6 @@ class TransportModel(mesa.Model):
         self._load_people()
         self._load_areas()
         self.selected_agent = None
-
-        self.day = 0
-        self.hour = 0
-        self.minute = 0
-        self.time_step = time_step
 
     def _get_network(self, network_type: str) -> MultiDiGraph:
         """Loads network from file in the scenario"""

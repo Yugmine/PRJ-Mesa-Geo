@@ -25,11 +25,26 @@ def draw(agent: mesa.Agent) -> dict:
 
     return portrayal
 
-def selected_agent_text(model: TransportModel) -> solara.Text:
-    """Text showing which agent has been clicked on to select it"""
+def selected_agent_card(model: TransportModel) -> solara.Card:
+    """Card showing information on the selected agent"""
     if model.selected_agent is None:
-        return solara.Text("No agent selected")
-    return solara.Text(f"Selected agent: {model.selected_agent.name}")
+        return solara.Card(title="No agent selected")
+
+    if model.selected_agent.current_target is None:
+        components = solara.Text("Not currently travelling")
+    else:
+        components = solara.Column(children=[
+            solara.Text(
+                f"Travelling to: {model.locations[model.selected_agent.current_target]['name']}"
+            ),
+            solara.Text(f"Mode is {model.selected_agent.current_mode}")
+        ])
+
+    card = solara.Card(
+        title=f"Selected agent: {model.selected_agent.name}",
+        children=[components]
+    )
+    return card
 
 def clock_text(model: TransportModel) -> solara.Text:
     """Text showing the current simulated time"""
@@ -39,11 +54,11 @@ model_params = {
     "scenario": "ton_test",
     "time_step": {
         "type": "SliderInt",
-        "value": 15,
+        "value": 5,
         "label": "Minutes per step:",
-        "min": 5,
-        "max": 60,
-        "step": 5,
+        "min": 1,
+        "max": 15,
+        "step": 1,
     },
 }
 
@@ -55,7 +70,7 @@ page = SolaraViz(
     model_params=model_params,
     components=[
         make_geospace_component(draw),
-        selected_agent_text,
+        selected_agent_card,
         clock_text
     ],
 )
