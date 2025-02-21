@@ -25,7 +25,7 @@ class TransportModel(mesa.Model):
     minute: int
     time_step: int
 
-    def __init__(self, scenario: str, time_step: int = 15) -> None:
+    def __init__(self, scenario: str, time_step: int = 5) -> None:
         """
         Constructor for the model
 

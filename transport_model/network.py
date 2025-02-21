@@ -39,17 +39,23 @@ class TransportNetwork():
         """Gets the length of the provided path"""
         return nx.path_weight(self.graph, path, "length")
 
-    def _get_final_edge(self, path: list[int], dist: float) -> tuple[int, int, float]:
+    def _get_final_edge(self, path: list[int], dist: float) -> tuple[int, int, float, float]:
         """
         Gets which edge we'll end up on after moving the provided distance,
         and how far along it we are.
+
+        Returns:
+        - Edge start node
+        - Edge end node
+        - Edge length
+        - How far along the edge we are (in metres)
         """
         cumulative_length = 0
         for i in range(len(path) - 1):
             edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
             if cumulative_length + edge_data["length"] > dist:
                 dist_along_edge = dist - cumulative_length
-                return path[i], path[i + 1], dist_along_edge
+                return path[i], path[i + 1], edge_data["length"], dist_along_edge
             cumulative_length += edge_data["length"]
         return None
 
@@ -74,7 +80,7 @@ class TransportNetwork():
         - Path offset
         - New location
         """
-        edge_u, edge_v, offset = self._get_final_edge(path, dist)
+        edge_u, edge_v, length, offset = self._get_final_edge(path, dist)
         new_path = self._trim_path_to_node(path, edge_u)
         edge_data = self.graph.get_edge_data(edge_u, edge_v)[0]
 
@@ -82,7 +88,10 @@ class TransportNetwork():
             geometry = edge_data["geometry"]
         else:
             geometry = self._create_line(edge_u, edge_v)
-        new_point = geometry.interpolate(offset)
+        # Shapely geometry coords are geographical coordinates, so length is not in metres.
+        # Convert the offset to the units Shapely is using.
+        interpolation_dist = (offset / length) * geometry.length
+        new_point = geometry.interpolate(interpolation_dist)
         new_location = (new_point.x, new_point.y)
         return new_path, offset, new_location
         

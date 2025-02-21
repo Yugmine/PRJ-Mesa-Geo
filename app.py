@@ -51,7 +51,7 @@ def clock_text(model: TransportModel) -> solara.Text:
     return solara.Text(f"Day: {model.day} {model.hour:02d}:{model.minute:02d}")
 
 model_params = {
-    "scenario": "ton_test",
+    "scenario": "east_peckham",
     "time_step": {
         "type": "SliderInt",
         "value": 5,

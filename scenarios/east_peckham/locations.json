@@ -1,0 +1,14 @@
+[
+    {
+        "name": "12 Pippin Rd",
+        "lat": 51.213930,
+        "long": 0.384020,
+        "description": "Home of Alex."
+    },
+    {
+        "name": "Robert Country Vehicles",
+        "lat": 51.210431,
+        "long": 0.395685,
+        "description": "Vehicle repair shop that offers car repairs and MOTs."
+    }
+]
