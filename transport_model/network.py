@@ -94,7 +94,7 @@ class TransportNetwork():
         new_point = geometry.interpolate(interpolation_dist)
         new_location = (new_point.x, new_point.y)
         return new_path, offset, new_location
-        
+
 # potentially make agents disappear when they're not moving (do this later)
 
 # for car need to check distance for each edge individually (because of different speed limits)

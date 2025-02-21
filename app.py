@@ -1,12 +1,13 @@
 """Solara visualization of the model"""
 import solara
-import mesa
+from mesa import Agent
+from mesa.visualization import make_plot_component
 from transport_model.model import TransportModel
 from transport_model.agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from utils.custom_geospace_component import make_geospace_component
 from utils.custom_solara_viz import SolaraViz
 
-def draw(agent: mesa.Agent) -> dict:
+def draw(agent: Agent) -> dict:
     """Defines how a given agent should be represented"""
     portrayal = {}
 
@@ -50,6 +51,8 @@ def clock_text(model: TransportModel) -> solara.Text:
     """Text showing the current simulated time"""
     return solara.Text(f"Day: {model.day} {model.hour:02d}:{model.minute:02d}")
 
+mode_plot = make_plot_component(["num_driving", "num_walking", "num_cycling"])
+
 model_params = {
     "scenario": "east_peckham",
     "time_step": {
@@ -71,7 +74,8 @@ page = SolaraViz(
     components=[
         make_geospace_component(draw),
         selected_agent_card,
-        clock_text
+        clock_text,
+        mode_plot
     ],
 )
 # This is required to render the visualization in the Jupyter notebook

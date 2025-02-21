@@ -1,6 +1,7 @@
 """A model with people who go places"""
 import json
 import os
+from functools import partial
 import mesa
 import mesa_geo as mg
 import geopandas
@@ -9,6 +10,11 @@ from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
 from .agents import Person, NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
+
+def get_num_agents_by_mode(model: mesa.Model, mode: str) -> int:
+    """Returns the number of agents currently travelling by the given mode"""
+    agents = [agent for agent in model.agents_by_type[Person] if agent.current_mode == mode]
+    return len(agents)
 
 class TransportModel(mesa.Model):
     """The core model class"""
@@ -24,6 +30,7 @@ class TransportModel(mesa.Model):
     hour: int
     minute: int
     time_step: int
+    datacollector: mesa.DataCollector
 
     def __init__(self, scenario: str, time_step: int = 5) -> None:
         """
@@ -52,6 +59,14 @@ class TransportModel(mesa.Model):
         self._load_people()
         self._load_areas()
         self.selected_agent = None
+
+        self.datacollector = mesa.DataCollector(
+            model_reporters={
+                "num_driving": partial(get_num_agents_by_mode, mode="drive"),
+                "num_walking": partial(get_num_agents_by_mode, mode="walk"),
+                "num_cycling": partial(get_num_agents_by_mode, mode="bike"),
+            }
+        )
 
     def _get_network(self, network_type: str) -> MultiDiGraph:
         """Loads network from file in the scenario"""
@@ -119,6 +134,7 @@ class TransportModel(mesa.Model):
         return long, lat
 
     def step(self) -> None:
+        self.datacollector.collect(self)
         self._update_clock()
         self.agents_by_type[Person].shuffle_do("step")
 
