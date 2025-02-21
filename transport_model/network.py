@@ -132,18 +132,80 @@ class DriveNetwork(TransportNetwork):
             return sum(num_limits) / len(limit)
         return self._get_num_limit(limit)
 
-    def _get_edge_time(self, u: int, v: int, attrs: dict) -> float:
+    def _get_edge_time(self, attrs: dict) -> float:
         """
-        Calculates how long (in hours) it would take to traverse
+        Calculates how long (in minutes) it would take to traverse
         a link travelling at the speed limit.
         """
-        speed_limit = self._get_speed_limit(attrs[0])
-        return (attrs[0]["length"] / 1000) / speed_limit
+        speed_limit = self._get_speed_limit(attrs)
+        return ((attrs["length"] / 1000) / speed_limit) * 60
+
+    def _astar_weight(self, u: int, v: int, attrs: dict) -> float:
+        """Wrapper to match expected function signature for astar weight function"""
+        return self._get_edge_time(attrs[0])
+
+    def _get_final_edge_time(self, path: list[int], time: float) -> tuple[int, int, float, float]:
+        """
+        Gets which edge we'll end up on after moving for the specified
+        amount of time (in minutes), and how far along it we are.
+
+        Returns:
+        - Edge start node
+        - Edge end node
+        - Edge traversal time (in minutes)
+        - How far through traversing the edge we are (in minutes)
+        """
+        cumulative_time = 0
+        for i in range(len(path) - 1):
+            edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            edge_time = self._get_edge_time(edge_data)
+            if cumulative_time + edge_time > time:
+                time_along_edge = time - cumulative_time
+                return path[i], path[i + 1], edge_time, time_along_edge
+            cumulative_time += edge_time
+        return None
 
     @override
     def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
         """Plans a driving route from the source node to the target node"""
-        return nx.astar_path(self.graph, source, target, weight=self._get_edge_time)
+        return nx.astar_path(self.graph, source, target, weight=self._astar_weight)
+
+    # FIXME: weird overriding where it's changed from distance to time
+    # potentially sort this by changing everything to work on time
+    # just trying to get it to work for now though
+    @override
+    def get_path_length(self, path: list[int]) -> float:
+        """Gets the length of the provided path (in minutes)"""
+        total_time = 0
+        for i in range(len(path) - 1):
+            edge_info = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            total_time += self._get_edge_time(edge_info)
+        return total_time
+
+    @override
+    def traverse_path(self, path: list[int], time: int):
+        """
+        Traverses the provided path for the specified time (in minutes).
+        Callers should verify that time < path length.
+
+        Returns:
+        - Remaining path
+        - Path offset
+        - New location
+        """
+        edge_u, edge_v, edge_time, time_offset = self._get_final_edge_time(path, time)
+        new_path = self._trim_path_to_node(path, edge_u)
+        edge_data = self.graph.get_edge_data(edge_u, edge_v)[0]
+
+        if "geometry" in edge_data:
+            geometry = edge_data["geometry"]
+        else:
+            geometry = self._create_line(edge_u, edge_v)
+        # Proportion of how far along we are * total length of edge
+        interpolation_dist = (time_offset / edge_time) * geometry.length
+        new_point = geometry.interpolate(interpolation_dist)
+        new_location = (new_point.x, new_point.y)
+        return new_path, time_offset, new_location
 
 class WalkNetwork(TransportNetwork):
     """Network for walking"""

@@ -64,7 +64,7 @@ def model_info(model: TransportModel) -> solara.Column:
 mode_plot = make_plot_component(["num_driving", "num_walking", "num_cycling"])
 
 model_params = {
-    "scenario": "east_peckham",
+    "scenario": "ton_test",
     "time_step": {
         "type": "SliderInt",
         "value": 5,

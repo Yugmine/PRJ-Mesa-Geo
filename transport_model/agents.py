@@ -65,13 +65,13 @@ class Person(mg.GeoAgent):
         """Sets this agent's current location"""
         self.geometry = Point(location)
 
-    def _plan_active_trip(self, location: int, network: TransportNetwork) -> None:
+    def _plan_trip(self, location: int, network: TransportNetwork) -> None:
         """
         Plans a trip to the location with the provided ID
         Currently it just plans the quickest route
         """
         # TODO: include the LLM in this process + do for car
-        source= network.get_nearest_node((self.geometry.x, self.geometry.y))
+        source = network.get_nearest_node((self.geometry.x, self.geometry.y))
         target_coords = self.model.get_location_coords(location)
         target = network.get_nearest_node(target_coords)
         if source != target:
@@ -80,14 +80,19 @@ class Person(mg.GeoAgent):
             self.current_path = network.plan_route(source, target)
             self.current_target = location
 
+    def _plan_driving_trip(self, location: int) -> None:
+        """Plans a driving trip"""
+        self._plan_trip(location, self.model.drive_network)
+        self.current_mode = "drive"
+
     def _plan_walking_trip(self, location: int) -> None:
         """Plans a walking trip"""
-        self._plan_active_trip(location, self.model.walk_network)
+        self._plan_trip(location, self.model.walk_network)
         self.current_mode = "walk"
 
     def _plan_cycling_trip(self, location: int) -> None:
         """Plans a cycling trip"""
-        self._plan_active_trip(location, self.model.bike_network)
+        self._plan_trip(location, self.model.bike_network)
         self.current_mode = "bike"
 
     def _follow_path_simple(self, dist: float, network: TransportNetwork) -> None:
@@ -102,25 +107,37 @@ class Person(mg.GeoAgent):
             self.current_path, self.path_offset, new_location = network.traverse_path(self.current_path, dist + self.path_offset)
         self._set_location(new_location)
 
+    def _follow_path_car(self, time: float) -> None:
+        """Move along the planned path by car (at the speed limit)"""
+        network = self.model.drive_network
+        path_time = network.get_path_length(self.current_path)
+        if time > path_time - self.path_offset:
+            # We have reached our destination
+            new_location = self.model.get_location_coords(self.current_target)
+            self._clear_path()
+        else:
+            # Still Travelling
+            self.current_path, self.path_offset, new_location = network.traverse_path(self.current_path, time + self.path_offset)
+        self._set_location(new_location)
+
     def _move(self) -> None:
         """Move along the planned path"""
-        # TODO: handle driving
         if self.current_mode == "drive":
-            raise NotImplementedError
+            self._follow_path_car(self.model.time_step)
         elif self.current_mode == "walk":
             self._follow_path_simple(self.walk_dist_per_step, self.model.walk_network)
         elif self.current_mode == "bike":
             self._follow_path_simple(self.bike_dist_per_step, self.model.bike_network)
 
     def step(self) -> None:
-        # temp test: gets all agents to cycle to and from Beltring station
+        # temp test: gets all agents to drive to and from Tonbridge station
         if self.current_path:
             self._move()
         else:
-            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(2):
-                self._plan_cycling_trip(self.home)
+            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(3):
+                self._plan_driving_trip(self.home)
             else:
-                self._plan_cycling_trip(2)
+                self._plan_driving_trip(3)
 
 class NetworkLink(mg.GeoAgent):
     """A transport link between two points (e.g. a road)"""
