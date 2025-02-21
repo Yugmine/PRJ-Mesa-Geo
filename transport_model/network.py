@@ -16,6 +16,43 @@ class TransportNetwork():
         node_positions = [(node[1]["x"], node[1]["y"]) for node in self.graph.nodes.data()]
         self.kd_tree = KDTree(node_positions)
 
+    def _trim_path_to_node(self, path: list[int], node: int) -> list[int]:
+        """Creates a new path without any nodes before the given node"""
+        index = path.index(node)
+        return path[index:]
+
+    def _create_line(self, start: int, end: int) -> LineString:
+        """Creates a Shapely LineString between the provided nodes"""
+        start_pos = self.get_node_coords(start)
+        end_pos = self.get_node_coords(end)
+        return LineString([start_pos, end_pos])
+
+    def _get_final_edge(
+            self,
+            path: list[int],
+            time: float,
+            speed: float = None
+        ) -> tuple[int, int, float, float]:
+        """
+        Gets which edge we'll end up on after moving for the specified amount
+        of time (in minutes), and how far through traversing it we are.
+
+        Returns:
+        - Edge start node
+        - Edge end node
+        - Edge traversal time (in minutes)
+        - How far through traversing the edge we are (in minutes)
+        """
+        cumulative_time = 0
+        for i in range(len(path) - 1):
+            edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            edge_time = self._get_edge_time(edge_data, speed)
+            if cumulative_time + edge_time > time:
+                time_along_edge = time - cumulative_time
+                return path[i], path[i + 1], edge_time, time_along_edge
+            cumulative_time += edge_time
+        return None
+
     def get_nearest_node(self, coords: tuple[float, float]) -> int:
         """Gets the id of the nearest node in the road network to the provided point"""
         node_index = self.kd_tree.query([coords], k=1, return_distance=False)
@@ -31,56 +68,36 @@ class TransportNetwork():
         gdfs = ox.convert.graph_to_gdfs(self.graph) # tuple w/ format (nodes, edges)
         return gdfs[1]
 
-    def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
-        """Plans a route from the source node to the target node"""
-        return nx.astar_path(self.graph, source, target, weight="length")
-
-    def get_path_length(self, path: list[int]) -> float:
-        """Gets the length of the provided path"""
-        return nx.path_weight(self.graph, path, "length")
-
-    def _get_final_edge(self, path: list[int], dist: float) -> tuple[int, int, float, float]:
+    def get_path_length(self, path: list[int], speed: float = None) -> float:
         """
-        Gets which edge we'll end up on after moving the provided distance,
-        and how far along it we are.
-
-        Returns:
-        - Edge start node
-        - Edge end node
-        - Edge length
-        - How far along the edge we are (in metres)
+        Gets the length of the provided path (in minutes)
+        
+        speed is optional and only used for walking + cycling
         """
-        cumulative_length = 0
+        total_time = 0
         for i in range(len(path) - 1):
-            edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
-            if cumulative_length + edge_data["length"] > dist:
-                dist_along_edge = dist - cumulative_length
-                return path[i], path[i + 1], edge_data["length"], dist_along_edge
-            cumulative_length += edge_data["length"]
-        return None
+            edge_info = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            total_time += self._get_edge_time(edge_info, speed)
+        return total_time
 
-    def _trim_path_to_node(self, path: list[int], node: int) -> list[int]:
-        """Creates a new path without any nodes before the given node"""
-        index = path.index(node)
-        return path[index:]
-
-    def _create_line(self, start: int, end: int) -> LineString:
-        """Creates a Shapely LineString between the provided nodes"""
-        start_pos = self.get_node_coords(start)
-        end_pos = self.get_node_coords(end)
-        return LineString([start_pos, end_pos])
-
-    def traverse_path(self, path: list[int], dist: float) -> tuple[list[int], float, tuple[float, float]]:
+    def traverse_path(
+            self,
+            path: list[int],
+            time: int,
+            speed: float = None
+        ) -> tuple[list[int], float, tuple[float, float]]:
         """
-        Traverses the provided path by the specified distance.
-        Callers should verify that dist < path length.
+        Traverses the provided path for the specified time (in minutes).
+        Callers should verify that time < path length.
+
+        speed is optional and only used when calculating edge time for walking + cycling
 
         Returns:
         - Remaining path
         - Path offset
         - New location
         """
-        edge_u, edge_v, length, offset = self._get_final_edge(path, dist)
+        edge_u, edge_v, edge_time, time_offset = self._get_final_edge(path, time, speed)
         new_path = self._trim_path_to_node(path, edge_u)
         edge_data = self.graph.get_edge_data(edge_u, edge_v)[0]
 
@@ -88,17 +105,19 @@ class TransportNetwork():
             geometry = edge_data["geometry"]
         else:
             geometry = self._create_line(edge_u, edge_v)
-        # Shapely geometry coords are geographical coordinates, so length is not in metres.
-        # Convert the offset to the units Shapely is using.
-        interpolation_dist = (offset / length) * geometry.length
+        # Proportion of how far along we are * total length of edge
+        interpolation_dist = (time_offset / edge_time) * geometry.length
         new_point = geometry.interpolate(interpolation_dist)
         new_location = (new_point.x, new_point.y)
-        return new_path, offset, new_location
+        return new_path, time_offset, new_location
 
-# potentially make agents disappear when they're not moving (do this later)
+    def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
+        """Get the time taken to traverse the given edge"""
+        raise NotImplementedError("Implemented in subclass")
 
-# for car need to check distance for each edge individually (because of different speed limits)
-
+    def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
+        """Plan a route from the source node to the target node"""
+        raise NotImplementedError("Implemented in subclass")
 
 class DriveNetwork(TransportNetwork):
     """
@@ -132,83 +151,44 @@ class DriveNetwork(TransportNetwork):
             return sum(num_limits) / len(limit)
         return self._get_num_limit(limit)
 
-    def _get_edge_time(self, attrs: dict) -> float:
-        """
-        Calculates how long (in minutes) it would take to traverse
-        a link travelling at the speed limit.
-        """
-        speed_limit = self._get_speed_limit(attrs)
-        return ((attrs["length"] / 1000) / speed_limit) * 60
-
     def _astar_weight(self, u: int, v: int, attrs: dict) -> float:
         """Wrapper to match expected function signature for astar weight function"""
         return self._get_edge_time(attrs[0])
 
-    def _get_final_edge_time(self, path: list[int], time: float) -> tuple[int, int, float, float]:
+    @override
+    def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """
-        Gets which edge we'll end up on after moving for the specified
-        amount of time (in minutes), and how far along it we are.
+        Calculates how long (in minutes) it would take to traverse
+        a link travelling at the speed limit.
 
-        Returns:
-        - Edge start node
-        - Edge end node
-        - Edge traversal time (in minutes)
-        - How far through traversing the edge we are (in minutes)
+        speed is not used in this function (speed is assumed to be at the limit on any edge)
         """
-        cumulative_time = 0
-        for i in range(len(path) - 1):
-            edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
-            edge_time = self._get_edge_time(edge_data)
-            if cumulative_time + edge_time > time:
-                time_along_edge = time - cumulative_time
-                return path[i], path[i + 1], edge_time, time_along_edge
-            cumulative_time += edge_time
-        return None
+        speed_limit = self._get_speed_limit(attrs)
+        return ((attrs["length"] / 1000) / speed_limit) * 60
 
     @override
     def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
         """Plans a driving route from the source node to the target node"""
         return nx.astar_path(self.graph, source, target, weight=self._astar_weight)
 
-    # FIXME: weird overriding where it's changed from distance to time
-    # potentially sort this by changing everything to work on time
-    # just trying to get it to work for now though
-    @override
-    def get_path_length(self, path: list[int]) -> float:
-        """Gets the length of the provided path (in minutes)"""
-        total_time = 0
-        for i in range(len(path) - 1):
-            edge_info = self.graph.get_edge_data(path[i], path[i + 1])[0]
-            total_time += self._get_edge_time(edge_info)
-        return total_time
+class ActiveNetwork(TransportNetwork):
+    """Network for active travel (walking + cycling)"""
 
     @override
-    def traverse_path(self, path: list[int], time: int):
+    def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """
-        Traverses the provided path for the specified time (in minutes).
-        Callers should verify that time < path length.
-
-        Returns:
-        - Remaining path
-        - Path offset
-        - New location
+        Calculates how long (in minutes) it would take to traverse
+        a link travelling at the given speed
         """
-        edge_u, edge_v, edge_time, time_offset = self._get_final_edge_time(path, time)
-        new_path = self._trim_path_to_node(path, edge_u)
-        edge_data = self.graph.get_edge_data(edge_u, edge_v)[0]
+        return ((attrs["length"] / 1000) / speed) * 60
 
-        if "geometry" in edge_data:
-            geometry = edge_data["geometry"]
-        else:
-            geometry = self._create_line(edge_u, edge_v)
-        # Proportion of how far along we are * total length of edge
-        interpolation_dist = (time_offset / edge_time) * geometry.length
-        new_point = geometry.interpolate(interpolation_dist)
-        new_location = (new_point.x, new_point.y)
-        return new_path, time_offset, new_location
+    @override
+    def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
+        """Plans a route from the source node to the target node"""
+        return nx.astar_path(self.graph, source, target, weight="length")
 
-class WalkNetwork(TransportNetwork):
+class WalkNetwork(ActiveNetwork):
     """Network for walking"""
 
-class BikeNetwork(TransportNetwork):
+class BikeNetwork(ActiveNetwork):
     """Network for cycling"""

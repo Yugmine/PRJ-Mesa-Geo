@@ -54,7 +54,9 @@ def clock_text(model: TransportModel) -> solara.Text:
 def model_info(model: TransportModel) -> solara.Column:
     """Displays global information about the model"""
     num_agents = len(model.agents_by_type[Person])
-    num_travelling = len([agent for agent in model.agents_by_type[Person] if agent.current_mode is not None])
+    num_travelling = len(
+        [agent for agent in model.agents_by_type[Person] if agent.current_mode is not None]
+    )
     return solara.Column(children=[
         clock_text(model),
         solara.Text(f"{num_agents} Agent(s) Total"),
@@ -64,7 +66,7 @@ def model_info(model: TransportModel) -> solara.Column:
 mode_plot = make_plot_component(["num_driving", "num_walking", "num_cycling"])
 
 model_params = {
-    "scenario": "ton_test",
+    "scenario": "east_peckham",
     "time_step": {
         "type": "SliderInt",
         "value": 5,
