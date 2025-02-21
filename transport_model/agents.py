@@ -113,14 +113,14 @@ class Person(mg.GeoAgent):
             self._follow_path_simple(self.bike_dist_per_step, self.model.bike_network)
 
     def step(self) -> None:
-        # temp test: gets all agents to walk to and from Robert Country Vehicles
+        # temp test: gets all agents to cycle to and from Beltring station
         if self.current_path:
             self._move()
         else:
-            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(1):
-                self._plan_walking_trip(self.home)
+            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(2):
+                self._plan_cycling_trip(self.home)
             else:
-                self._plan_walking_trip(1)
+                self._plan_cycling_trip(2)
 
 class NetworkLink(mg.GeoAgent):
     """A transport link between two points (e.g. a road)"""

@@ -51,6 +51,16 @@ def clock_text(model: TransportModel) -> solara.Text:
     """Text showing the current simulated time"""
     return solara.Text(f"Day: {model.day} {model.hour:02d}:{model.minute:02d}")
 
+def model_info(model: TransportModel) -> solara.Column:
+    """Displays global information about the model"""
+    num_agents = len(model.agents_by_type[Person])
+    num_travelling = len([agent for agent in model.agents_by_type[Person] if agent.current_mode is not None])
+    return solara.Column(children=[
+        clock_text(model),
+        solara.Text(f"{num_agents} Agent(s) Total"),
+        solara.Text(f"{num_travelling} Agent(s) Travelling")
+    ])
+
 mode_plot = make_plot_component(["num_driving", "num_walking", "num_cycling"])
 
 model_params = {
@@ -74,7 +84,7 @@ page = SolaraViz(
     components=[
         make_geospace_component(draw),
         selected_agent_card,
-        clock_text,
+        model_info,
         mode_plot
     ],
 )

@@ -10,5 +10,11 @@
         "lat": 51.210431,
         "long": 0.395685,
         "description": "Vehicle repair shop that offers car repairs and MOTs."
+    },
+    {
+        "name": "Beltring Train Station",
+        "lat": 51.204794,
+        "long": 0.403424,
+        "description": "Train station with regular trains to Strood and Paddock Wood."
     }
 ]
