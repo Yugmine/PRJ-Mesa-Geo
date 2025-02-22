@@ -3,6 +3,7 @@ import random
 import mesa
 import mesa_geo as mg
 from shapely import Point, Polygon
+from utils.llm import generate_response
 from .network import TransportNetwork
 
 class Person(mg.GeoAgent):
@@ -128,6 +129,7 @@ class Person(mg.GeoAgent):
                 self._plan_walking_trip(self.home)
             else:
                 self._plan_walking_trip(1)
+                print(generate_response("Hello mr chatgpt"))
 
 class NetworkLink(mg.GeoAgent):
     """A transport link between two points (e.g. a road)"""
