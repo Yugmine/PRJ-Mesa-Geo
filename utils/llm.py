@@ -1,4 +1,5 @@
 """Handles calls to the large language model"""
+import os
 from openai import OpenAI
 
 client = OpenAI(
@@ -20,3 +21,19 @@ def generate_response(content: str) -> str:
         temperature=0.7
     )
     return chat_completion.choices[0].message.content
+
+def generate_prompt(inputs: list, prompt_file: str) -> str:
+    """
+    Fills in the chosen prompt template with the provided inputs.
+
+    Code + template format partially taken from:
+    https://github.com/joonspk-research/generative_agents/
+    """
+    path = os.path.join("./prompt_templates", prompt_file)
+    with open(path, "r", encoding="utf-8") as f:
+        prompt = f.read()
+    for idx, input_val in enumerate(inputs):
+        prompt = prompt.replace(f"<INPUT {idx}>", input_val)
+    if "<END COMMENT>" in prompt:
+        prompt = prompt.split("<END COMMENT>")[1]
+    return prompt.strip()

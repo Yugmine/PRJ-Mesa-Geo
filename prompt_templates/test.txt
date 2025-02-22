@@ -1,0 +1,8 @@
+test.txt
+
+Variables:
+<INPUT 0> -- Persona name
+
+<END COMMENT>
+
+Your name is <INPUT 0>. Hi <INPUT 0>!
