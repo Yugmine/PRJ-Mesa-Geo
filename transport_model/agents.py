@@ -14,11 +14,11 @@ class Person(mg.GeoAgent):
     description         Natural language description of the person.
     current_path        List of nodes that the person is travelling between (empty if not moving).
     path_offset         When this person is following a path and is in the middle of an edge,
-                        gives how far along the edge they are.
+                        gives how far through traversing it they are (in minutes).
     current_mode        Current transport mode the person is using (None if not moving).
     current_target      ID of the location the person is travelling to (None if not moving).
-    walk_dist_per_step  Distance this person can walk in one time step.
-    bike_dist_per_step  Distance this person can cycle in one time step.
+    walk_speed          Average speed this person can walk at (km/h).
+    bike_speed          Average speed this person can cycle at (km/h).
     """
     name: str
     home: int
@@ -27,8 +27,8 @@ class Person(mg.GeoAgent):
     path_offset: float
     current_mode: str
     current_target: int
-    walk_dist_per_step: int
-    bike_dist_per_step: int
+    walk_speed: float
+    bike_speed: float
 
     def __init__(
         self,
@@ -46,10 +46,8 @@ class Person(mg.GeoAgent):
         self.description = description
         self._clear_path()
 
-        walk_speed = 1.4 # TODO: vary depending on agent definition
-        bike_speed = 4.2 # TODO: vary depending on agent definition
-        self.walk_dist_per_step = self.model.time_step * 60 * walk_speed
-        self.bike_dist_per_step = self.model.time_step * 60 * bike_speed
+        self.walk_speed = 5 # TODO: vary depending on agent definition
+        self.bike_speed = 15 # TODO: vary depending on agent definition
 
     def __repr__(self) -> str:
         return f"Agent {self.name}"
@@ -65,13 +63,13 @@ class Person(mg.GeoAgent):
         """Sets this agent's current location"""
         self.geometry = Point(location)
 
-    def _plan_active_trip(self, location: int, network: TransportNetwork) -> None:
+    def _plan_trip(self, location: int, network: TransportNetwork) -> None:
         """
         Plans a trip to the location with the provided ID
         Currently it just plans the quickest route
         """
-        # TODO: include the LLM in this process + do for car
-        source= network.get_nearest_node((self.geometry.x, self.geometry.y))
+        # TODO: include the LLM in this process
+        source = network.get_nearest_node((self.geometry.x, self.geometry.y))
         target_coords = self.model.get_location_coords(location)
         target = network.get_nearest_node(target_coords)
         if source != target:
@@ -80,47 +78,56 @@ class Person(mg.GeoAgent):
             self.current_path = network.plan_route(source, target)
             self.current_target = location
 
+    def _plan_driving_trip(self, location: int) -> None:
+        """Plans a driving trip"""
+        self._plan_trip(location, self.model.drive_network)
+        self.current_mode = "drive"
+
     def _plan_walking_trip(self, location: int) -> None:
         """Plans a walking trip"""
-        self._plan_active_trip(location, self.model.walk_network)
+        self._plan_trip(location, self.model.walk_network)
         self.current_mode = "walk"
 
     def _plan_cycling_trip(self, location: int) -> None:
         """Plans a cycling trip"""
-        self._plan_active_trip(location, self.model.bike_network)
+        self._plan_trip(location, self.model.bike_network)
         self.current_mode = "bike"
 
-    def _follow_path_simple(self, dist: float, network: TransportNetwork) -> None:
-        """Move along the planned path by bike or walking (at constant speed)"""
-        path_length = network.get_path_length(self.current_path)
-        if dist > path_length - self.path_offset:
+    def _follow_path(self, network: TransportNetwork, speed: float = None) -> None:
+        """Move along the planned path on the given network"""
+        path_time = network.get_path_length(self.current_path, speed)
+        time = self.model.time_step
+        if time > path_time - self.path_offset:
             # We have reached our destination
             new_location = self.model.get_location_coords(self.current_target)
             self._clear_path()
         else:
-            # Still travelling
-            self.current_path, self.path_offset, new_location = network.traverse_path(self.current_path, dist + self.path_offset)
+            # Still Travelling
+            self.current_path, self.path_offset, new_location = network.traverse_path(
+                path = self.current_path,
+                time = time + self.path_offset,
+                speed = speed
+            )
         self._set_location(new_location)
 
     def _move(self) -> None:
         """Move along the planned path"""
-        # TODO: handle driving
         if self.current_mode == "drive":
-            raise NotImplementedError
+            self._follow_path(self.model.drive_network)
         elif self.current_mode == "walk":
-            self._follow_path_simple(self.walk_dist_per_step, self.model.walk_network)
+            self._follow_path(self.model.walk_network, self.walk_speed)
         elif self.current_mode == "bike":
-            self._follow_path_simple(self.bike_dist_per_step, self.model.bike_network)
+            self._follow_path(self.model.bike_network, self.bike_speed)
 
     def step(self) -> None:
-        # temp test: gets all agents to cycle to and from Beltring station
+        # temp test: gets all agents to walk to and from Robert Country Vehicles
         if self.current_path:
             self._move()
         else:
-            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(2):
-                self._plan_cycling_trip(self.home)
+            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(1):
+                self._plan_walking_trip(self.home)
             else:
-                self._plan_cycling_trip(2)
+                self._plan_walking_trip(1)
 
 class NetworkLink(mg.GeoAgent):
     """A transport link between two points (e.g. a road)"""
