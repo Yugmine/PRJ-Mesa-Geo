@@ -1,0 +1,15 @@
+system_prompt.txt
+
+System prompt that gets inserted before any LLM call.
+Defines agent persona and environment information.
+
+Variables:
+<INPUT 0> -- Name
+<INPUT 1> -- Home
+<INPUT 2> -- Description
+
+<END COMMENT>
+
+Name: <INPUT 0>
+Home: <INPUT 1>
+Description: <INPUT 2>

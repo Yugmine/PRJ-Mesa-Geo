@@ -9,12 +9,12 @@ import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
 from .geo_agents import NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
-from .person_agent import Person
+from .person import Person, PersonAgent
 from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
 
 def get_num_agents_by_mode(model: mesa.Model, mode: str) -> int:
     """Returns the number of agents currently travelling by the given mode"""
-    agents = [agent for agent in model.agents_by_type[Person] if agent.current_mode == mode]
+    agents = [agent for agent in model.agents_by_type[PersonAgent] if agent.current_mode == mode]
     return len(agents)
 
 class TransportModel(mesa.Model):
@@ -26,7 +26,7 @@ class TransportModel(mesa.Model):
     drive_network: DriveNetwork
     walk_network: WalkNetwork
     bike_network: BikeNetwork
-    selected_agent: Person
+    selected_agent: PersonAgent
     day: int
     hour: int
     minute: int
@@ -92,13 +92,12 @@ class TransportModel(mesa.Model):
         with open(agents_path, encoding="utf-8") as f:
             agents_json = json.load(f)
 
-        for agent in agents_json:
-            new_agent = Person(
+        for info_dict in agents_json:
+            new_person = Person(info_dict)
+            new_agent = PersonAgent(
                 model = self,
                 crs = self.CRS,
-                name = agent["name"],
-                home = agent["home"],
-                description = agent["description"]
+                person = new_person
             )
             self.space.add_agents(new_agent)
 
@@ -128,15 +127,15 @@ class TransportModel(mesa.Model):
                 self.hour += 1
             self.minute = 0
 
-    def get_location_coords(self, loc_id: int) -> tuple[float, float]:
+    def get_location_coords(self, loc_name: str) -> tuple[float, float]:
         """Returns the coordinates of the specified location"""
-        long = self.locations[loc_id]["long"]
-        lat = self.locations[loc_id]["lat"]
+        long = self.locations[loc_name]["long"]
+        lat = self.locations[loc_name]["lat"]
         return long, lat
 
     def step(self) -> None:
         self.datacollector.collect(self)
         self._update_clock()
-        self.agents_by_type[Person].shuffle_do("step")
+        self.agents_by_type[PersonAgent].shuffle_do("step")
 
 # look into partially abstracting out households by having one super-agent represent each household

@@ -7,10 +7,14 @@ client = OpenAI(
     api_key = 'foo'
 )
 
-def generate_response(content: str) -> str:
+def generate_response(system_prompt: str, content: str) -> str:
     """Generates a response for the given prompt"""
     chat_completion = client.chat.completions.create(
         messages=[
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
             {
                 "role": "user",
                 "content": content,
@@ -29,7 +33,7 @@ def generate_prompt(inputs: list, prompt_file: str) -> str:
     Code + template format partially taken from:
     https://github.com/joonspk-research/generative_agents/
     """
-    path = os.path.join("./prompt_templates", prompt_file)
+    path = os.path.join("./prompt_templates", prompt_file + ".txt")
     with open(path, "r", encoding="utf-8") as f:
         prompt = f.read()
     for idx, input_val in enumerate(inputs):

@@ -1,26 +1,22 @@
-[
-    {
-        "name": "House A",
+{
+    "House A": {
         "lat": 51.207740701086024,
         "long": 0.2982390221367972,
         "description": "Home of Alice"
     },
-    {
-        "name": "House B",
+    "House B": {
         "lat": 51.21080257909883,
         "long": 0.2974123567285692,
         "description": "Home of Bob"
     },
-    {
-        "name": "House B",
+    "House C": {
         "lat": 51.20786298658563,
         "long": 0.2936972978196854,
         "description": "Home of Charlie"
     },
-    {
-        "name": "Tonbridge Station",
+    "Tonbridge Station": {
         "lat": 51.191465,
         "long": 0.270486,
         "description": "Train station with frequent trains to London and surrounding towns"
     }
-]
+}

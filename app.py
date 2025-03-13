@@ -4,7 +4,7 @@ from mesa import Agent
 from mesa.visualization import make_plot_component
 from transport_model.model import TransportModel
 from transport_model.geo_agents import Road, Area, ResidentialArea, RetailArea, IndustrialArea
-from transport_model.person_agent import Person
+from transport_model.person import PersonAgent
 from utils.custom_geospace_component import make_geospace_component
 from utils.custom_solara_viz import SolaraViz
 
@@ -12,8 +12,11 @@ def draw(agent: Agent) -> dict:
     """Defines how a given agent should be represented"""
     portrayal = {}
 
-    if isinstance(agent, Person):
-        portrayal["color"] = "red"
+    if isinstance(agent, PersonAgent):
+        if agent.model.selected_agent == agent:
+            portrayal["color"] = "brown"
+        else:
+            portrayal["color"] = "red"
     elif isinstance(agent, Road):
         portrayal["color"] = "grey"
     elif isinstance(agent, Area):
@@ -37,13 +40,13 @@ def selected_agent_card(model: TransportModel) -> solara.Card:
     else:
         components = solara.Column(children=[
             solara.Text(
-                f"Travelling to: {model.locations[model.selected_agent.current_target]['name']}"
+                f"Travelling to: {model.selected_agent.current_target}"
             ),
             solara.Text(f"Mode is {model.selected_agent.current_mode}")
         ])
 
     card = solara.Card(
-        title=f"Selected agent: {model.selected_agent.name}",
+        title=f"Selected agent: {model.selected_agent.person.name}",
         children=[components]
     )
     return card
@@ -54,9 +57,9 @@ def clock_text(model: TransportModel) -> solara.Text:
 
 def model_info(model: TransportModel) -> solara.Column:
     """Displays global information about the model"""
-    num_agents = len(model.agents_by_type[Person])
+    num_agents = len(model.agents_by_type[PersonAgent])
     num_travelling = len(
-        [agent for agent in model.agents_by_type[Person] if agent.current_mode is not None]
+        [agent for agent in model.agents_by_type[PersonAgent] if agent.current_mode is not None]
     )
     return solara.Column(children=[
         clock_text(model),

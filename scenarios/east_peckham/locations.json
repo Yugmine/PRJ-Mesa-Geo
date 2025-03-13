@@ -1,20 +1,17 @@
-[
-    {
-        "name": "12 Pippin Rd",
+{
+    "12 Pippin Rd": {
         "lat": 51.213930,
         "long": 0.384020,
         "description": "Home of Alex."
     },
-    {
-        "name": "Robert Country Vehicles",
+    "Robert Country Vehicles": {
         "lat": 51.210431,
         "long": 0.395685,
         "description": "Vehicle repair shop that offers car repairs and MOTs."
     },
-    {
-        "name": "Beltring Train Station",
+    "Beltring Train Station": {
         "lat": 51.204794,
         "long": 0.403424,
         "description": "Train station with regular trains to Strood and Paddock Wood."
     }
-]
+}

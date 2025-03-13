@@ -1,0 +1,16 @@
+daily_planning.txt
+
+Planning the agent's day in broad strokes.
+
+Variables:
+<INPUT 0> -- Persona name
+
+<END COMMENT>
+
+Generate <INPUT 0>'s plan today in broad-strokes.
+Where appropriate, this plan can continue into the early hours of tomorrow - this does not need to be stated.
+Each entry in the plan should be a short statement.
+Each entry should be a new line following the format: 00:00 action
+All times given should be valid times following the 24-hour format.
+Use this format, following it exactly:
+...
