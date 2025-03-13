@@ -1,9 +1,7 @@
-"""Agents for the model"""
-import random
+"""Agent that represents people in the model"""
 import mesa
 import mesa_geo as mg
-from shapely import Point, Polygon
-from utils.llm import generate_response
+from shapely import Point
 from .network import TransportNetwork
 
 class Person(mg.GeoAgent):
@@ -121,53 +119,12 @@ class Person(mg.GeoAgent):
             self._follow_path(self.model.bike_network, self.bike_speed)
 
     def step(self) -> None:
-        # temp test: gets all agents to walk to and from Robert Country Vehicles
+        # temp test: gets all agents to drive to and from Tonbridge Station
         if self.current_path:
             self._move()
         else:
-            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(1):
-                self._plan_walking_trip(self.home)
+            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords(3):
+                self._plan_driving_trip(self.home)
             else:
-                self._plan_walking_trip(1)
-                print(generate_response("Hello mr chatgpt"))
-
-class NetworkLink(mg.GeoAgent):
-    """A transport link between two points (e.g. a road)"""
-    unique_id: int
-    model: mesa.Model
-    geometry: Point
-
-class Road(NetworkLink):
-    """A road for cars"""
-
-# NOTE: currently unused
-class Walkway(NetworkLink):
-    """A path for pedestrians"""
-
-# NOTE: currently unused
-class Cycleway(NetworkLink):
-    """A route for cyclists"""
-
-class Area(mg.GeoAgent):
-    """Represents an OSM area"""
-    unique_id: int
-    model: mesa.Model
-    geometry: Polygon
-
-    # NOTE: currently unused
-    def get_random_point(self) -> Point:
-        """Returns a random point within this area"""
-        min_x, min_y, max_x, max_y = self.geometry.bounds
-        point = None
-        while not (point and point.within(self.geometry)):
-            point = Point(random.uniform(min_x, max_x), random.uniform(min_y, max_y))
-        return point
-
-class ResidentialArea(Area):
-    """An area where people live"""
-
-class RetailArea(Area):
-    """An area with shops"""
-
-class IndustrialArea(Area):
-    """An area with industry"""
+                self._plan_driving_trip(3)
+                #print(generate_response("Hello mr chatgpt"))

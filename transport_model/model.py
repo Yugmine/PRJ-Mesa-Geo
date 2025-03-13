@@ -8,7 +8,8 @@ import geopandas
 import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
-from .agents import Person, NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from .geo_agents import NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from .person_agent import Person
 from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
 
 def get_num_agents_by_mode(model: mesa.Model, mode: str) -> int:

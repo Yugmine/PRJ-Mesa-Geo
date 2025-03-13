@@ -3,7 +3,8 @@ import solara
 from mesa import Agent
 from mesa.visualization import make_plot_component
 from transport_model.model import TransportModel
-from transport_model.agents import Person, Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from transport_model.geo_agents import Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from transport_model.person_agent import Person
 from utils.custom_geospace_component import make_geospace_component
 from utils.custom_solara_viz import SolaraViz
 
@@ -66,7 +67,7 @@ def model_info(model: TransportModel) -> solara.Column:
 mode_plot = make_plot_component(["num_driving", "num_walking", "num_cycling"])
 
 model_params = {
-    "scenario": "east_peckham",
+    "scenario": "ton_test",
     "time_step": {
         "type": "SliderInt",
         "value": 5,
