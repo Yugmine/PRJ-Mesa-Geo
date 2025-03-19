@@ -14,7 +14,7 @@ from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
 
 def get_num_agents_by_mode(model: mesa.Model, mode: str) -> int:
     """Returns the number of agents currently travelling by the given mode"""
-    agents = [agent for agent in model.agents_by_type[PersonAgent] if agent.current_mode == mode]
+    agents = [agent for agent in model.agents_by_type[PersonAgent] if agent.get_current_mode() == mode]
     return len(agents)
 
 class TransportModel(mesa.Model):
@@ -140,10 +140,20 @@ class TransportModel(mesa.Model):
     def is_location(self, location: str) -> bool:
         """Checks if the provided location is in the environment"""
         return location in self.locations.keys()
-    
+
     def get_time(self) -> tuple[int, int]:
         """Returns the model time as a tuple (hour, minute)"""
         return (self.hour, self.minute)
+
+    def get_network(self, mode: str) -> TransportNetwork:
+        """Returns the network for the specified mode"""
+        if mode == "drive":
+            return self.drive_network
+        if mode == "walk":
+            return self.walk_network
+        if mode == "bike":
+            return self.bike_network
+        return None
 
     def step(self) -> None:
         self.datacollector.collect(self)

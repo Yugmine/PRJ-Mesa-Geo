@@ -35,14 +35,14 @@ def selected_agent_card(model: TransportModel) -> solara.Card:
     if model.selected_agent is None:
         return solara.Card(title="No agent selected")
 
-    if model.selected_agent.current_mode is None:
+    if not model.selected_agent.is_travelling():
         components = solara.Text("Not currently travelling")
     else:
         components = solara.Column(children=[
             solara.Text(
-                f"Travelling to: {model.selected_agent.current_target}"
+                f"Travelling to: {model.selected_agent.get_current_target()}"
             ),
-            solara.Text(f"Mode is {model.selected_agent.current_mode}")
+            solara.Text(f"Mode is {model.selected_agent.get_current_mode()}")
         ])
 
     card = solara.Card(
@@ -59,7 +59,7 @@ def model_info(model: TransportModel) -> solara.Column:
     """Displays global information about the model"""
     num_agents = len(model.agents_by_type[PersonAgent])
     num_travelling = len(
-        [agent for agent in model.agents_by_type[PersonAgent] if agent.current_mode is not None]
+        [agent for agent in model.agents_by_type[PersonAgent] if agent.is_travelling()]
     )
     return solara.Column(children=[
         clock_text(model),
