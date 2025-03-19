@@ -22,7 +22,7 @@ class Person():
     description: str
     walk_speed: float
     bike_speed: float
-    daily_plan: list[tuple[str, str]]
+    daily_plan: list[tuple[tuple[int, int], str]]
 
     def __init__(
         self,
@@ -33,15 +33,6 @@ class Person():
         self.description = info_dict["description"]
         self.walk_speed = 5 # TODO: vary depending on agent definition
         self.bike_speed = 15 # TODO: vary depending on agent definition
-
-    def _generate_system_prompt(self) -> str:
-        """Generates the system prompt for this person"""
-        inputs = [
-            self.name,
-            self.home,
-            self.description
-        ]
-        return generate_prompt(inputs, "system_prompt")
 
     def _break_down_plan(self, plan: str) -> None:
         """
@@ -64,18 +55,33 @@ class Person():
             hour = int(time.split(":")[0])
             minute = int(time.split(":")[1])
             action = line.removeprefix(time).strip()
-            cleaned_plan.append((hour, minute, action))
+            cleaned_plan.append(((hour, minute), action))
 
         self.daily_plan = cleaned_plan
-        #print(self.daily_plan)
+
+    def generate_system_prompt(self) -> str:
+        """Generates the system prompt for this person"""
+        inputs = [
+            self.name,
+            self.home,
+            self.description
+        ]
+        return generate_prompt(inputs, "system_prompt")
 
     def plan_day(self) -> None:
         """Generates a plan for this agent's day using the LLM"""
-        system_prompt = self._generate_system_prompt()
+        system_prompt = self.generate_system_prompt()
         prompt = generate_prompt([self.name], "daily_planning")
         response = generate_response(system_prompt, prompt)
         print(response)
         self._break_down_plan(response)
+
+    def get_next_action(self) -> tuple[tuple[int, int], str]:
+        """Returns the next action in this person's plan"""
+        if not self.daily_plan:
+            return None
+
+        return self.daily_plan.pop(0)
 
 class PersonAgent(mg.GeoAgent):
     """
@@ -86,13 +92,15 @@ class PersonAgent(mg.GeoAgent):
     path_offset         When this person is following a path and is in the middle of an edge,
                         gives how far through traversing it they are (in minutes).
     current_mode        Current transport mode the person is using (None if not moving).
-    current_target      Name of the location the person is travelling to (None if not moving).
+    current_target      Name of the location the person is travelling to, or is at.
+    next_move_time      The time that this agent will next move (None if not planning to move).
     """
     person: Person
     current_path: list[int]
     path_offset: float
     current_mode: str
     current_target: str
+    next_move_time: tuple[int, int]
 
     def __init__(
         self,
@@ -101,6 +109,7 @@ class PersonAgent(mg.GeoAgent):
         person: Person
     ) -> None:
         self.person = person
+        self.current_target = person.home
         geometry = Point(model.get_location_coords(person.home))
         super().__init__(model, geometry, crs)
         self._clear_path()
@@ -113,7 +122,7 @@ class PersonAgent(mg.GeoAgent):
         self.current_path = []
         self.path_offset = 0
         self.current_mode = None
-        self.current_target = None
+        self.next_move_time = None
 
     def _set_location(self, location: tuple[float, float]) -> None:
         """Sets this agent's current location"""
@@ -157,6 +166,7 @@ class PersonAgent(mg.GeoAgent):
             # We have reached our destination
             new_location = self.model.get_location_coords(self.current_target)
             self._clear_path()
+            self._next_plan_step()
         else:
             # Still Travelling
             self.current_path, self.path_offset, new_location = network.traverse_path(
@@ -175,13 +185,47 @@ class PersonAgent(mg.GeoAgent):
         elif self.current_mode == "bike":
             self._follow_path(self.model.bike_network, self.person.bike_speed)
 
+    def _generate_location_prompt(self, action: str) -> str:
+        """Fills the prompt template for getting the location for an action"""
+        inputs = [
+            self.person.name,
+            self.current_target,
+            self.model.get_location_names(),
+            action
+        ]
+        return generate_prompt(inputs, "action_location")
+
+    def _get_action_location(self, action: str) -> str:
+        """Gets the location to perform the given action"""
+        prompt = self._generate_location_prompt(action)
+        system_prompt = self.person.generate_system_prompt()
+
+        for _ in range (3):
+            action_location = generate_response(system_prompt, prompt)
+            if self.model.is_location(action_location):
+                return action_location
+
+        # Timeout - failed to generate valid location within 3 attempts
+        print(f"WARNING: agent {self.person.name} couldn't get valid location for action: {action}")
+        # Don't move
+        return self.current_target
+
+    def _next_plan_step(self) -> None:
+        """Gets the next step in this person's plan and loads it ready to be followed"""
+        time, action = self.person.get_next_action()
+        if action is None:
+            return
+
+        self.next_move_time = time
+        self.current_target = self._get_action_location(action)
+
     def step(self) -> None:
-        # temp test: gets all agents to drive to and from Tonbridge Station
         if self.current_path:
             self._move()
-        else:
-            if (self.geometry.x, self.geometry.y) == self.model.get_location_coords("Tonbridge Station"):
-                self._plan_driving_trip(self.person.home)
-            else:
-                self._plan_driving_trip("Tonbridge Station")
-                self.person.plan_day()
+        elif self.model.get_time() == self.next_move_time:
+            # move to the planned location
+            pass
+        elif self.model.get_time() == (5, 0):
+            # Plan for the day
+            self.person.plan_day()
+            self._next_plan_step()

@@ -35,7 +35,7 @@ def selected_agent_card(model: TransportModel) -> solara.Card:
     if model.selected_agent is None:
         return solara.Card(title="No agent selected")
 
-    if model.selected_agent.current_target is None:
+    if model.selected_agent.current_mode is None:
         components = solara.Text("Not currently travelling")
     else:
         components = solara.Column(children=[

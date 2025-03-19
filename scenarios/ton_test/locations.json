@@ -18,5 +18,15 @@
         "lat": 51.191465,
         "long": 0.270486,
         "description": "Train station with frequent trains to London and surrounding towns"
+    },
+    "Supermarket": {
+        "lat": 51.192421,
+        "long": 0.274706,
+        "description": "Supermarket with a large selection of food."
+    },
+    "Council Offices": {
+        "lat": 51.196469,
+        "long": 0.274572,
+        "description": "Offices where various functions of local administration are performed."
     }
 }

@@ -133,9 +133,19 @@ class TransportModel(mesa.Model):
         lat = self.locations[loc_name]["lat"]
         return long, lat
 
+    def get_location_names(self) -> list[str]:
+        """Returns a list of the name of every location"""
+        return list(self.locations.keys())
+
+    def is_location(self, location: str) -> bool:
+        """Checks if the provided location is in the environment"""
+        return location in self.locations.keys()
+    
+    def get_time(self) -> tuple[int, int]:
+        """Returns the model time as a tuple (hour, minute)"""
+        return (self.hour, self.minute)
+
     def step(self) -> None:
         self.datacollector.collect(self)
         self._update_clock()
         self.agents_by_type[PersonAgent].shuffle_do("step")
-
-# look into partially abstracting out households by having one super-agent represent each household
