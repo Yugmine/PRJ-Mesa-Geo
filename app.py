@@ -33,7 +33,7 @@ def draw(agent: Agent) -> dict:
 mode_plot = make_plot_component(["num_driving", "num_walking", "num_cycling"])
 
 model_params = {
-    "scenario": "ton_test",
+    "scenario": "tonbridge",
     "time_step": {
         "type": "SliderInt",
         "value": 5,

@@ -16,6 +16,8 @@ class Person:
     description         Natural language description of this person.
     walk_speed          Average speed this person can walk at (km/h).
     bike_speed          Average speed this person can cycle at (km/h).
+    owns_car            Whether this person owns a car.
+    owns_bike           Whether this person owns a bicycle.
     daily_plan          This person's plan for today. 
                         List of actions in the format (time, action).
     trip_memory         Stores memories of trip times.
@@ -25,6 +27,8 @@ class Person:
     description: str
     walk_speed: float
     bike_speed: float
+    owns_car: bool
+    owns_bike: bool
     daily_plan: list[tuple[Time, str]]
     trip_memory: TripMemory
 
@@ -35,8 +39,10 @@ class Person:
         self.name = info_dict["name"]
         self.home = info_dict["home"]
         self.description = info_dict["description"]
-        self.walk_speed = 5 # TODO: vary depending on agent definition
-        self.bike_speed = 15 # TODO: vary depending on agent definition
+        self.walk_speed = info_dict["walk_speed"]
+        self.bike_speed = info_dict["bike_speed"]
+        self.owns_car = info_dict["owns_car"]
+        self.owns_bike = info_dict["owns_bike"]
         self.daily_plan = []
         self.trip_memory = TripMemory()
 
