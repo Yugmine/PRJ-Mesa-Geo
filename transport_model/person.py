@@ -78,7 +78,6 @@ class Person:
         system_prompt = self.generate_system_prompt()
         prompt = generate_prompt([self.name], "daily_planning")
         response = generate_response(system_prompt, prompt)
-        print(response)
         self._break_down_plan(response)
 
     def get_next_action(self) -> tuple[tuple[int, int], str]:
@@ -199,9 +198,10 @@ class PersonAgent(mg.GeoAgent):
 
     def _next_plan_step(self) -> None:
         """Gets the next step in this person's plan and loads it ready to be followed"""
-        time, action = self.person.get_next_action()
-        if action is None:
+        entry = self.person.get_next_action()
+        if entry is None:
             return
+        time, action = entry
         destination = self._get_action_location(action)
 
         if destination == self.location:

@@ -43,8 +43,8 @@ class TransportModel(mesa.Model):
         super().__init__()
 
         self.scenario_path = os.path.join("./scenarios", scenario)
-        self.day = 0
-        self.hour = 0
+        self.day = 1
+        self.hour = 4
         self.minute = 0
         self.time_step = time_step
 
@@ -156,6 +156,6 @@ class TransportModel(mesa.Model):
         return None
 
     def step(self) -> None:
+        self.agents_by_type[PersonAgent].shuffle_do("step")
         self.datacollector.collect(self)
         self._update_clock()
-        self.agents_by_type[PersonAgent].shuffle_do("step")
