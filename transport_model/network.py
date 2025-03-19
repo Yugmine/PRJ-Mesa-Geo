@@ -1,10 +1,23 @@
 """Handles transport networks and operations on them"""
 from typing import override
+from dataclasses import dataclass
 import osmnx as ox
 import networkx as nx
 from sklearn.neighbors import KDTree
 from geopandas import GeoDataFrame
 from shapely import LineString
+from .routes import Route
+
+@dataclass
+class Edge:
+    """
+    Represents an edge in the graph.
+    
+    u       ID of the starting node of this edge.
+    v       ID of the ending node of this edge.
+    """
+    u: int
+    v: int
 
 class TransportNetwork():
     """Represents a transport network"""
@@ -16,23 +29,24 @@ class TransportNetwork():
         node_positions = [(node[1]["x"], node[1]["y"]) for node in self.graph.nodes.data()]
         self.kd_tree = KDTree(node_positions)
 
-    def _trim_path_to_node(self, path: list[int], node: int) -> list[int]:
-        """Creates a new path without any nodes before the given node"""
-        index = path.index(node)
-        return path[index:]
-
-    def _create_line(self, start: int, end: int) -> LineString:
-        """Creates a Shapely LineString between the provided nodes"""
-        start_pos = self.get_node_coords(start)
-        end_pos = self.get_node_coords(end)
-        return LineString([start_pos, end_pos])
+    def _get_path_duration(self, path: list[int], speed: float = None) -> float:
+        """
+        Gets the length of the provided path (in minutes)
+        
+        speed is optional and only used for walking + cycling
+        """
+        total_time = 0
+        for i in range(len(path) - 1):
+            edge_info = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            total_time += self._get_edge_time(edge_info, speed)
+        return total_time
 
     def _get_final_edge(
             self,
             path: list[int],
             time: float,
             speed: float = None
-        ) -> tuple[int, int, float, float]:
+        ) -> tuple[Edge, float, float]:
         """
         Gets which edge we'll end up on after moving for the specified amount
         of time (in minutes), and how far through traversing it we are.
@@ -49,9 +63,42 @@ class TransportNetwork():
             edge_time = self._get_edge_time(edge_data, speed)
             if cumulative_time + edge_time > time:
                 time_along_edge = time - cumulative_time
-                return path[i], path[i + 1], edge_time, time_along_edge
+                return Edge(path[i], path[i + 1]), edge_time, time_along_edge
             cumulative_time += edge_time
         return None
+
+    def _create_line(self, edge: Edge) -> LineString:
+        """Creates a Shapely LineString for the provided edge"""
+        start_pos = self.get_node_coords(edge.u)
+        end_pos = self.get_node_coords(edge.v)
+        return LineString([start_pos, end_pos])
+
+    def _get_edge_geometry(self, edge: Edge) -> LineString:
+        """
+        Gets the edge geometry for the provided edge,
+        or creates a line if it doesn't have any set geometry.
+        """
+        edge_data = self.graph.get_edge_data(edge.u, edge.v)[0]
+
+        if "geometry" in edge_data:
+            return edge_data["geometry"]
+
+        return self._create_line(edge)
+
+    def _get_point_along_edge(
+            self,
+            edge: Edge,
+            progress: float
+        ) -> tuple[float, float]:
+        """
+        Gets a point along the provided edge.
+        progress is how far along the edge the point should be.
+        e.g. if progress = 0.4, the point should be 40% along the edge.
+        """
+        geometry = self._get_edge_geometry(edge)
+        interpolation_dist =  progress * geometry.length
+        new_point = geometry.interpolate(interpolation_dist)
+        return (new_point.x, new_point.y)
 
     def get_nearest_node(self, coords: tuple[float, float]) -> int:
         """Gets the id of the nearest node in the road network to the provided point"""
@@ -68,48 +115,38 @@ class TransportNetwork():
         gdfs = ox.convert.graph_to_gdfs(self.graph) # tuple w/ format (nodes, edges)
         return gdfs[1]
 
-    def get_path_length(self, path: list[int], speed: float = None) -> float:
-        """
-        Gets the length of the provided path (in minutes)
-        
-        speed is optional and only used for walking + cycling
-        """
-        total_time = 0
-        for i in range(len(path) - 1):
-            edge_info = self.graph.get_edge_data(path[i], path[i + 1])[0]
-            total_time += self._get_edge_time(edge_info, speed)
-        return total_time
-
-    def traverse_path(
+    def traverse_route(
             self,
-            path: list[int],
-            time: int,
+            route: Route,
+            time_step: int,
             speed: float = None
-        ) -> tuple[list[int], float, tuple[float, float]]:
+        ) -> tuple[tuple[float, float], float]:
         """
-        Traverses the provided path for the specified time (in minutes).
-        Callers should verify that time < path length.
+        Traverses the provided route.
 
         speed is optional and only used when calculating edge time for walking + cycling
 
         Returns:
-        - Remaining path
-        - Path offset
-        - New location
+        -   New location for the agent (None if route is complete)
+        -   Remaining time in the step
+            (e.g. if step is 5 mins and it only needs to move for
+            3 mins to finish, return 2 mins)
         """
-        edge_u, edge_v, edge_time, time_offset = self._get_final_edge(path, time, speed)
-        new_path = self._trim_path_to_node(path, edge_u)
-        edge_data = self.graph.get_edge_data(edge_u, edge_v)[0]
+        path_time = self._get_path_duration(route.path, speed)
+        traversal_time = time_step + route.path_offset
 
-        if "geometry" in edge_data:
-            geometry = edge_data["geometry"]
-        else:
-            geometry = self._create_line(edge_u, edge_v)
-        # Proportion of how far along we are * total length of edge
-        interpolation_dist = (time_offset / edge_time) * geometry.length
-        new_point = geometry.interpolate(interpolation_dist)
-        new_location = (new_point.x, new_point.y)
-        return new_path, time_offset, new_location
+        if traversal_time > path_time:
+            # Route completed
+            time_left = traversal_time - path_time
+            return None, time_left
+
+        edge, edge_time, new_offset = self._get_final_edge(route.path, traversal_time, speed)
+        route.trim_path_to_node(edge.u)
+        route.set_offset(new_offset)
+
+        progress = new_offset / edge_time
+        new_location = self._get_point_along_edge(edge, progress)
+        return new_location, 0.0
 
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """Get the time taken to traverse the given edge"""

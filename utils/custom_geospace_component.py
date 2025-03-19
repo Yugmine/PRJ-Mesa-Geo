@@ -313,4 +313,3 @@ class MapModule:
 def click_callback(model, agent, **kwargs):
     """Changes the curently selected agent to the one that was clicked"""
     model.selected_agent = agent
-    print(model.selected_agent)

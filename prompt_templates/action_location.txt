@@ -1,0 +1,21 @@
+action_location.txt
+
+Getting the location to perform a given action.
+
+Variables:
+<INPUT 0> -- Persona's name
+<INPUT 1> -- Agent's current location
+<INPUT 2> -- Locations this agent is aware of
+<INPUT 3> -- The action
+
+<END COMMENT>
+
+<INPUT 0> is currently at <INPUT 1>.
+
+They are aware of the following locations (and only these locations):
+<INPUT 2>
+
+Answer only with one location and nothing else.
+Prefer to stay in the current location if the action can be performed there.
+Where should <INPUT 0> perform the following action?
+<INPUT 3>

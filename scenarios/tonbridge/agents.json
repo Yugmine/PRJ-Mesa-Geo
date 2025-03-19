@@ -1,0 +1,29 @@
+[
+    {
+        "name": "Alice",
+        "home": "House A",
+        "description": "Alice lives in House A and works as a cashier at the Supermarket. Her work hours are 06:00 - 16:00.",
+        "owns_car": false,
+        "owns_bike": true,
+        "walk_speed": 6.0,
+        "bike_speed": 18.0
+    },
+    {
+        "name": "Bob",
+        "home": "House B",
+        "description": "Bob lives in House B and works at the Council Offices. His work hours are 09:00 - 17:00.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.2,
+        "bike_speed": 12.5
+    },
+    {
+        "name": "Charlie",
+        "home": "House C",
+        "description": "Charlie lives in House C and works at the Supermarket as a security guard. His work hours are 13:00 - 23:00.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 5.0,
+        "bike_speed": 15.0
+    }
+]

@@ -2,6 +2,10 @@
     {
         "name": "Alex",
         "home": "12 Pippin Rd",
-        "description": "Alex lives at 12 Pippin Rd and works as a mechanic at Robert Country Vehicles from 09:00 - 17:00."
+        "description": "Alex lives at 12 Pippin Rd and works as a mechanic at Robert Country Vehicles from 09:00 - 17:00.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 5.0,
+        "bike_speed": 15.0
     }
 ]

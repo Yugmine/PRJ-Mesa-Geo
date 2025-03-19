@@ -1,10 +1,10 @@
 """Solara visualization of the model"""
-import solara
 from mesa import Agent
 from mesa.visualization import make_plot_component
 from transport_model.model import TransportModel
 from transport_model.geo_agents import Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from transport_model.person import PersonAgent
+from utils.viz_components import selected_agent_card, model_info
 from utils.custom_geospace_component import make_geospace_component
 from utils.custom_solara_viz import SolaraViz
 
@@ -30,47 +30,10 @@ def draw(agent: Agent) -> dict:
 
     return portrayal
 
-def selected_agent_card(model: TransportModel) -> solara.Card:
-    """Card showing information on the selected agent"""
-    if model.selected_agent is None:
-        return solara.Card(title="No agent selected")
-
-    if model.selected_agent.current_target is None:
-        components = solara.Text("Not currently travelling")
-    else:
-        components = solara.Column(children=[
-            solara.Text(
-                f"Travelling to: {model.selected_agent.current_target}"
-            ),
-            solara.Text(f"Mode is {model.selected_agent.current_mode}")
-        ])
-
-    card = solara.Card(
-        title=f"Selected agent: {model.selected_agent.person.name}",
-        children=[components]
-    )
-    return card
-
-def clock_text(model: TransportModel) -> solara.Text:
-    """Text showing the current simulated time"""
-    return solara.Text(f"Day: {model.day} {model.hour:02d}:{model.minute:02d}")
-
-def model_info(model: TransportModel) -> solara.Column:
-    """Displays global information about the model"""
-    num_agents = len(model.agents_by_type[PersonAgent])
-    num_travelling = len(
-        [agent for agent in model.agents_by_type[PersonAgent] if agent.current_mode is not None]
-    )
-    return solara.Column(children=[
-        clock_text(model),
-        solara.Text(f"{num_agents} Agent(s) Total"),
-        solara.Text(f"{num_travelling} Agent(s) Travelling")
-    ])
-
 mode_plot = make_plot_component(["num_driving", "num_walking", "num_cycling"])
 
 model_params = {
-    "scenario": "ton_test",
+    "scenario": "tonbridge",
     "time_step": {
         "type": "SliderInt",
         "value": 5,
@@ -90,8 +53,8 @@ page = SolaraViz(
     components=[
         make_geospace_component(draw),
         selected_agent_card,
-        model_info,
-        mode_plot
+        mode_plot,
+        model_info
     ],
 )
 # This is required to render the visualization in the Jupyter notebook

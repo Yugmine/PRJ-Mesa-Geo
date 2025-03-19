@@ -37,7 +37,7 @@ def generate_prompt(inputs: list, prompt_file: str) -> str:
     with open(path, "r", encoding="utf-8") as f:
         prompt = f.read()
     for idx, input_val in enumerate(inputs):
-        prompt = prompt.replace(f"<INPUT {idx}>", input_val)
+        prompt = prompt.replace(f"<INPUT {idx}>", str(input_val))
     if "<END COMMENT>" in prompt:
         prompt = prompt.split("<END COMMENT>")[1]
     return prompt.strip()

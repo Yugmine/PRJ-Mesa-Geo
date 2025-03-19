@@ -1,4 +1,4 @@
-name: mesa_geo_test
+name: prj_mesa_geo
 channels:
   - defaults
   - https://repo.anaconda.com/pkgs/main

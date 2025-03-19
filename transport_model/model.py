@@ -8,13 +8,14 @@ import geopandas
 import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
+from utils.model_time import Time
 from .geo_agents import NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from .person import Person, PersonAgent
 from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
 
 def get_num_agents_by_mode(model: mesa.Model, mode: str) -> int:
     """Returns the number of agents currently travelling by the given mode"""
-    agents = [agent for agent in model.agents_by_type[PersonAgent] if agent.current_mode == mode]
+    agents = [agent for agent in model.agents_by_type[PersonAgent] if agent.get_current_mode() == mode]
     return len(agents)
 
 class TransportModel(mesa.Model):
@@ -28,8 +29,7 @@ class TransportModel(mesa.Model):
     bike_network: BikeNetwork
     selected_agent: PersonAgent
     day: int
-    hour: int
-    minute: int
+    time: Time
     time_step: int
     datacollector: mesa.DataCollector
 
@@ -43,9 +43,8 @@ class TransportModel(mesa.Model):
         super().__init__()
 
         self.scenario_path = os.path.join("./scenarios", scenario)
-        self.day = 0
-        self.hour = 0
-        self.minute = 0
+        self.day = 1
+        self.time = Time(4, 0)
         self.time_step = time_step
 
         self.space = mg.GeoSpace(crs=self.CRS, warn_crs_conversion=False)
@@ -118,14 +117,9 @@ class TransportModel(mesa.Model):
 
     def _update_clock(self):
         """Updates the simulation clock by the specified time step"""
-        self.minute += self.time_step
-        if self.minute == 60:
-            if self.hour == 23:
-                self.hour = 0
-                self.day += 1
-            else:
-                self.hour += 1
-            self.minute = 0
+        new_day = self.time.perform_time_step(self.time_step)
+        if new_day:
+            self.day += 1
 
     def get_location_coords(self, loc_name: str) -> tuple[float, float]:
         """Returns the coordinates of the specified location"""
@@ -133,9 +127,25 @@ class TransportModel(mesa.Model):
         lat = self.locations[loc_name]["lat"]
         return long, lat
 
+    def get_location_names(self) -> list[str]:
+        """Returns a list of the name of every location"""
+        return list(self.locations.keys())
+
+    def is_location(self, location: str) -> bool:
+        """Checks if the provided location is in the environment"""
+        return location in self.locations.keys()
+
+    def get_network(self, mode: str) -> TransportNetwork:
+        """Returns the network for the specified mode"""
+        if mode == "drive":
+            return self.drive_network
+        if mode == "walk":
+            return self.walk_network
+        if mode == "bike":
+            return self.bike_network
+        return None
+
     def step(self) -> None:
+        self.agents_by_type[PersonAgent].shuffle_do("step")
         self.datacollector.collect(self)
         self._update_clock()
-        self.agents_by_type[PersonAgent].shuffle_do("step")
-
-# look into partially abstracting out households by having one super-agent represent each household
