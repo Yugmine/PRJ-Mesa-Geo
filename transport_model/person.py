@@ -16,7 +16,7 @@ class Person:
     walk_speed          Average speed this person can walk at (km/h).
     bike_speed          Average speed this person can cycle at (km/h).
     daily_plan          This person's plan for today. 
-                        List of actions in the format (hour, minute, action).
+                        List of actions in the format (time, action).
     trip_memory         Stores memories of trip times.
     """
     name: str
@@ -36,6 +36,7 @@ class Person:
         self.description = info_dict["description"]
         self.walk_speed = 5 # TODO: vary depending on agent definition
         self.bike_speed = 15 # TODO: vary depending on agent definition
+        self.daily_plan = []
         self.trip_memory = TripMemory()
 
     def _break_down_plan(self, plan: str) -> None:
@@ -216,15 +217,6 @@ class PersonAgent(mg.GeoAgent):
     def is_travelling(self) -> bool:
         """Checks if this agent is travelling (true) or stationary (false)"""
         return self.route is not None
-
-    def get_current_target(self) -> str:
-        """
-        Returns the location this agent is travelling to.
-        Returns None if this agent is not travelling.
-        """
-        if not self.is_travelling():
-            return None
-        return self.trip.destination
 
     def get_current_mode(self) -> str:
         """
