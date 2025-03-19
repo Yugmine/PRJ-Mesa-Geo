@@ -4,6 +4,7 @@ import mesa
 import mesa_geo as mg
 from shapely import Point
 from utils.llm import generate_response, generate_prompt
+from utils.model_time import Time
 from .routes import Trip, Route, TripMemory
 
 class Person:
@@ -24,7 +25,7 @@ class Person:
     description: str
     walk_speed: float
     bike_speed: float
-    daily_plan: list[tuple[tuple[int, int], str]]
+    daily_plan: list[tuple[Time, str]]
     trip_memory: TripMemory
 
     def __init__(
@@ -60,7 +61,7 @@ class Person:
             hour = int(time.split(":")[0])
             minute = int(time.split(":")[1])
             action = line.removeprefix(time).strip()
-            cleaned_plan.append(((hour, minute), action))
+            cleaned_plan.append((Time(hour, minute), action))
 
         self.daily_plan = cleaned_plan
 
@@ -80,7 +81,7 @@ class Person:
         response = generate_response(system_prompt, prompt)
         self._break_down_plan(response)
 
-    def get_next_action(self) -> tuple[tuple[int, int], str]:
+    def get_next_action(self) -> tuple[Time, str]:
         """Returns the next action in this person's plan"""
         if not self.daily_plan:
             return None
@@ -150,12 +151,17 @@ class PersonAgent(mg.GeoAgent):
             return self.person.bike_speed
         return None
 
+    def _add_to_memory(self, mins_left: float) -> None:
+        """Adds the trip that just finished to memory"""
+        end_time = self.model.time.n_mins_from_now(mins_left)
+        self.person.trip_memory.add_trip(self.trip, self.route.mode, end_time)
+
     def _follow_route(self) -> None:
         """Move along the planned route"""
         network = self.model.get_network(self.route.mode)
         speed = self._get_speed(self.route.mode)
 
-        new_position = network.traverse_route(
+        new_position, mins_left = network.traverse_route(
             route = self.route,
             time_step = self.model.time_step,
             speed = speed
@@ -165,6 +171,7 @@ class PersonAgent(mg.GeoAgent):
             # We have reached our destination
             new_position = self.model.get_location_coords(self.trip.destination)
             self.location = self.trip.destination
+            self._add_to_memory(mins_left)
             self.trip = None
             self.route = None
             self._next_plan_step()
@@ -231,10 +238,10 @@ class PersonAgent(mg.GeoAgent):
         if self.is_travelling():
             self._follow_route()
         elif self.trip is not None:
-            if self.model.get_time() == self.trip.start_time:
+            if self.model.time == self.trip.start_time:
                 # move to the planned location
                 self._plan_route("walk")
-        elif self.model.get_time() == (4, 0):
+        elif self.model.time == Time(4, 0):
             # Plan for the day
             self.person.plan_day()
             self._next_plan_step()

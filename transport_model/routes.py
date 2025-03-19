@@ -1,5 +1,6 @@
 """Classes to help with trips and routes"""
 from dataclasses import dataclass
+from utils.model_time import Time
 
 @dataclass
 class Trip:
@@ -12,7 +13,7 @@ class Trip:
     """
     origin: str
     destination: str
-    start_time: tuple[int, int]
+    start_time: Time
 
 @dataclass
 class Route:
@@ -45,42 +46,24 @@ class TripMemory:
     memory          Stores memories of previous trips
                     Uses the form (origin, destination) : {mode: travel_time}
     """
-    memory: dict[tuple[str, str, str], dict[str, float]]
+    memory: dict[tuple[str, str], dict[str, float]]
 
     def __init__(self) -> None:
         self.memory = {}
-
-    def _calculate_trip_time(
-            self,
-            start_time: tuple[int, int],
-            end_time: tuple[int, float]
-        ) -> float:
-        """Calculates how long a trip took (in minutes)"""
-        # FIXME: Assumes trips can't take longer than a day
-        (start_hour, start_minute) = start_time
-        (end_hour, end_minute) = end_time
-
-        if end_hour < start_hour:
-            # We've rolled over to tomorrow
-            time_before_midnight = (60 * (23 - start_hour)) + (60 - start_minute)
-            time_after_midnight = (60 * end_hour) + end_minute
-            return time_before_midnight + time_after_midnight
-
-        return (60 * (end_hour - start_hour)) + (end_minute - start_minute)
 
     def add_trip(
             self,
             trip: Trip,
             mode: str,
-            end_time: tuple[int, float]
+            end_time: Time
         ) -> None:
         """Adds a trip to the memory"""
-        # Currently, only stores the latest trip
+        # Currently, only stores the latest trip and stores in both directions
         # TODO: store an average over all trips?
         path = (trip.origin, trip.destination)
         if path not in self.memory:
             self.memory[path] = {}
-        trip_time = self._calculate_trip_time(trip.start_time, end_time)
+        trip_time = trip.start_time.time_to(end_time)
         self.memory[path][mode] = trip_time
 
     def get_trip_times(self, trip: Trip) -> dict[str, float]:

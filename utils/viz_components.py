@@ -2,6 +2,7 @@
 import solara
 from transport_model.model import TransportModel
 from transport_model.person import PersonAgent
+from utils.model_time import Time
 
 def agent_mode_view(agent: PersonAgent) -> solara.Text:
     """Displays information about the provided agent's travel mode"""
@@ -14,22 +15,20 @@ def agent_trip_view(agent: PersonAgent) -> solara.Details:
     if agent.trip is None:
         content = solara.Text("No trip planned")
     else:
-        hours = agent.trip.start_time[0]
-        minutes = agent.trip.start_time[1]
         content = solara.Column(children=[
             solara.Text(f"Origin: {agent.trip.origin}"),
             solara.Text(f"Destination: {agent.trip.destination}"),
-            solara.Text(f"Start time: {hours:02d}:{minutes:02d}")
+            solara.Text(f"Start time: {agent.trip.start_time}")
         ])
     return solara.Details(
         summary="Next trip:",
         children=[content]
     )
 
-def plan_entry_text(entry: tuple[tuple[int, int], str]) -> solara.Text:
+def plan_entry_text(entry: tuple[Time, str]) -> solara.Text:
     """Displays the provided entry in the plan"""
-    ((hours, minutes), action) = entry
-    return solara.Text(f"{hours:02d}:{minutes:02d} - {action}")
+    time, action = entry
+    return solara.Text(f"{time} - {action}")
 
 def agent_plan_view(agent: PersonAgent) -> solara.Details:
     """Displays information about the provided agent's daily plan"""
@@ -64,7 +63,7 @@ def selected_agent_card(model: TransportModel) -> solara.Card:
 
 def clock_text(model: TransportModel) -> solara.Text:
     """Text showing the current simulated time"""
-    return solara.Text(f"Day: {model.day} {model.hour:02d}:{model.minute:02d}")
+    return solara.Text(f"Day: {model.day} {model.time}")
 
 def model_info(model: TransportModel) -> solara.Column:
     """Displays global information about the model"""

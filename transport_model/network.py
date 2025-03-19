@@ -120,21 +120,25 @@ class TransportNetwork():
             route: Route,
             time_step: int,
             speed: float = None
-        ) -> tuple[float, float]:
+        ) -> tuple[tuple[float, float], float]:
         """
         Traverses the provided route.
 
         speed is optional and only used when calculating edge time for walking + cycling
 
         Returns:
-        - New location for the agent (None if route is complete)
+        -   New location for the agent (None if route is complete)
+        -   Remaining time in the step
+            (e.g. if step is 5 mins and it only needs to move for
+            3 mins to finish, return 2 mins)
         """
         path_time = self._get_path_duration(route.path, speed)
         traversal_time = time_step + route.path_offset
 
         if traversal_time > path_time:
             # Route completed
-            return None
+            time_left = traversal_time - path_time
+            return None, time_left
 
         edge, edge_time, new_offset = self._get_final_edge(route.path, traversal_time, speed)
         route.trim_path_to_node(edge.u)
@@ -142,7 +146,7 @@ class TransportNetwork():
 
         progress = new_offset / edge_time
         new_location = self._get_point_along_edge(edge, progress)
-        return new_location
+        return new_location, 0.0
 
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """Get the time taken to traverse the given edge"""
