@@ -59,7 +59,7 @@ class TransportNetwork():
         """
         cumulative_time = 0
         for i in range(len(path) - 1):
-            edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            edge_data = self.edge_info(path[i], path[i + 1])
             edge_time = self._get_edge_time(edge_data, speed)
             if cumulative_time + edge_time > time:
                 time_along_edge = time - cumulative_time
@@ -147,6 +147,10 @@ class TransportNetwork():
         progress = new_offset / edge_time
         new_location = self._get_point_along_edge(edge, progress)
         return new_location, 0.0
+
+    def edge_info(self, edge_u, edge_v) -> dict:
+        """Gets information for the provided edge"""
+        return self.graph.get_edge_data(edge_u, edge_v)[0]
 
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """Get the time taken to traverse the given edge"""

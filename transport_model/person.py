@@ -5,7 +5,7 @@ import mesa_geo as mg
 from shapely import Point
 from utils.llm import generate_response, generate_prompt
 from utils.model_time import Time
-from .routes import Trip, Route, TripMemory
+from .routes import Trip, Route, TravelMemory, MemoryEntry, RoadType
 
 class Person:
     """
@@ -20,7 +20,7 @@ class Person:
     owns_bike           Whether this person owns a bicycle.
     daily_plan          This person's plan for today. 
                         List of actions in the format (time, action).
-    trip_memory         Stores memories of trip times.
+    memory              Stores memories of previous journeys.
     """
     name: str
     home: str
@@ -30,7 +30,7 @@ class Person:
     owns_car: bool
     owns_bike: bool
     daily_plan: list[tuple[Time, str]]
-    trip_memory: TripMemory
+    memory: TravelMemory
 
     def __init__(
         self,
@@ -44,7 +44,7 @@ class Person:
         self.owns_car = info_dict["owns_car"]
         self.owns_bike = info_dict["owns_bike"]
         self.daily_plan = []
-        self.trip_memory = TripMemory()
+        self.memory = TravelMemory()
 
     def _break_down_plan(self, plan: str) -> None:
         """
@@ -98,15 +98,18 @@ class PersonAgent(mg.GeoAgent):
     """
     Represents one person in the model space.
 
-    person          The person this agent is representing.
-    trip            This person's next planned trip.
-    route           This person's current route (None if not travelling).
-    location        This person's current location (None if travelling).
+    person              The person this agent is representing.
+    trip                This person's next planned trip.
+    route               This person's current route (None if not travelling).
+    location            This person's current location (None if travelling).
+    memory_entry        The current memory being built.
+                        (This memory remembers information about the current trip).
     """
     person: Person
     trip: Trip
     route: Route
     location: str
+    memory_entry: MemoryEntry
 
     def __init__(
         self,
@@ -116,8 +119,7 @@ class PersonAgent(mg.GeoAgent):
     ) -> None:
         self.person = person
         self.location = person.home
-        self.trip = None
-        self.route = None
+        self._clear_travel_info()
         geometry = Point(model.get_location_coords(person.home))
         super().__init__(model, geometry, crs)
 
@@ -127,6 +129,12 @@ class PersonAgent(mg.GeoAgent):
     def _set_position(self, position: tuple[float, float]) -> None:
         """Sets this agent's current position"""
         self.geometry = Point(position)
+
+    def _clear_travel_info(self) -> None:
+        """Clears information stored when travelling"""
+        self.trip = None
+        self.route = None
+        self.memory_entry = None
 
     def _plan_route(self, mode: str) -> None:
         """
@@ -145,6 +153,7 @@ class PersonAgent(mg.GeoAgent):
             # TODO: include the LLM in this process
             path = network.plan_route(origin, destination)
             self.route = Route(mode, path)
+            self.memory_entry = self.person.memory.get_or_init_journey(self.trip, self.route)
 
     def _get_speed(self, mode: str) -> float:
         """
@@ -157,15 +166,76 @@ class PersonAgent(mg.GeoAgent):
             return self.person.bike_speed
         return None
 
-    def _add_to_memory(self, mins_left: float) -> None:
-        """Adds the trip that just finished to memory"""
+    def _calculate_trip_time(self, mins_left: float) -> float:
+        """
+        Calculates how long the trip that just finished took.
+
+        Args:
+            mins_left       How many minutes are left in the current time step
+                            (after the trip finished).
+        """
         end_time = self.model.time.n_mins_from_now(mins_left)
-        self.person.trip_memory.add_trip(self.trip, self.route.mode, end_time)
+        return self.trip.start_time.time_to(end_time)
+
+    def _handle_list_attrs(self, attr: str | list) -> str:
+        """
+        Sometimes OSM attributes are lists instead of strings.
+        Return the first entry if this is the case.
+        """
+        if isinstance(attr, list):
+            return attr[0]
+        return attr
+
+    def _get_road_type(self, attrs: dict) -> RoadType:
+        """Creates a RoadType object from the provided attributes dict"""
+        highway = self._handle_list_attrs(attrs["highway"])
+        if "maxspeed" not in attrs:
+            maxspeed = "n/a"
+        else:
+            maxspeed = self._handle_list_attrs(attrs["maxspeed"])
+        return RoadType(highway, maxspeed)
+
+    def _get_comfort(self, road: RoadType, mode: str) -> int:
+        """Gets a comfort value for the provided road type and mode"""
+        system_prompt = self.person.generate_system_prompt()
+        if mode == "bike":
+            template = "cyclist_comfort"
+        else:
+            template = "walking_comfort"
+        prompt = generate_prompt([self.person.name, road.highway, road.maxspeed], template)
+        return generate_response(system_prompt, prompt)
+
+    def _remember_comfort(self, old_path: list[int]) -> None:
+        """
+        Generates and stores comfort values for the edges we just traversed.
+
+        Args:
+            old_path        The route path before we moved.
+        """
+        if self.route.mode == "driving":
+            # Comfort for driving assumed to be invariable.
+            return
+
+        network = self.model.get_network(self.route.mode)
+        # Get the nodes of the edges we've traversed
+        nodes = [node for node in old_path if node not in self.route.path]
+        nodes.append(self.route.path[0])
+
+        # For every edge, store a comfort value
+        for i in range(len(nodes) - 1):
+            road = self._get_road_type(network.edge_info(nodes[i], nodes[i + 1]))
+            comfort = self.person.memory.get_comfort(road, self.route.mode)
+            if comfort is None:
+                comfort = self._get_comfort(road, self.route.mode)
+                self.person.memory.store_comfort(road, self.route.mode, comfort)
+            self.memory_entry.add_comfort(comfort)
 
     def _follow_route(self) -> None:
         """Move along the planned route"""
         network = self.model.get_network(self.route.mode)
         speed = self._get_speed(self.route.mode)
+
+        old_path = self.route.path
 
         new_position, mins_left = network.traverse_route(
             route = self.route,
@@ -173,13 +243,23 @@ class PersonAgent(mg.GeoAgent):
             speed = speed
         )
 
+        self._remember_comfort(old_path)
+
         if new_position is None:
             # We have reached our destination
             new_position = self.model.get_location_coords(self.trip.destination)
             self.location = self.trip.destination
-            self._add_to_memory(mins_left)
-            self.trip = None
-            self.route = None
+            trip_time = self._calculate_trip_time(mins_left)
+            self.memory_entry.update_travel_time(trip_time)
+
+            # debugging
+            print(self.memory_entry.mode)
+            print(self.memory_entry.travel_time)
+            print(self.memory_entry.count)
+            print(self.memory_entry.path)
+            print(self.memory_entry.comfort)
+
+            self._clear_travel_info()
             self._next_plan_step()
 
         self._set_position(new_position)
