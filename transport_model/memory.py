@@ -1,24 +1,18 @@
 """Memory used to store the agents' past experiences with travel"""
 from typing import override
-from .routes import Trip, Route, RoadType
+from .routes import RoadType
 
 class MemoryEntry:
     """
     An entry for one route in TravelMemory.
 
-    mode            The transport mode used for the route.
-    path            The path taken for the route.
     travel_time     The mean time this route has taken to complete.
     count           How many times this route has been completed.
     """
-    mode: str
-    path: list[int]
     travel_time: float
     count: int
 
-    def __init__(self, mode: str, path: list[int]) -> None:
-        self.mode = mode
-        self.path = path
+    def __init__(self) -> None:
         self.travel_time = 0.0
         self.count = 0
 
@@ -44,10 +38,10 @@ class ActiveMemoryEntry(MemoryEntry):
     edge_comfort: list[int]
     lengths: list[float]
 
-    def __init__(self, mode: str, path: list[int]) -> None:
+    def __init__(self) -> None:
         self.comfort = 0.0
         self._clear_temp_vars()
-        super().__init__(mode, path)
+        super().__init__()
 
     def _clear_temp_vars(self) -> None:
         """
@@ -85,43 +79,41 @@ class TravelMemory:
     Stores memory of previous experiences with travel.
     Memories can be used to influence planning + mode choice.
 
-    journey_memory      Stores memories of previous journeys.
-                        Uses the form (origin, destination) : [list of entries]
+    route_memory        Stores memories of previous routes.
+                        Uses the form (mode, path) : entry
     comfort_memory      Caches comfort values generated for the given road type.
                         Uses the form RoadType: {mode: comfort}
     """
-    journey_memory: dict[tuple[str, str], list[MemoryEntry]]
+    route_memory: dict[tuple[str, tuple[int, ...]], MemoryEntry]
     comfort_memory: dict[RoadType, dict[str, int]]
 
     def __init__(self) -> None:
-        self.journey_memory = {}
+        self.route_memory = {}
         self.comfort_memory = {}
 
-    def journey_entry_by_key(self, key: tuple[str, str], mode: str, path: list[int]) -> MemoryEntry:
+    def get_route_entry(self, mode: str, path: list[int]) -> MemoryEntry | None:
         """
-        Gets the entry for the specified key and route.
+        Gets the entry for the specified mode and path.
         Returns None if it doesn't exist.
         """
-        if key not in self.journey_memory:
+        key = (mode, tuple(path))
+        if key not in self.route_memory:
             return None
-        entries = self.journey_memory[key]
-        for entry in entries:
-            if entry.mode == mode and entry.path == path:
-                return entry
-        return None
+        return self.route_memory[key]
 
-    def get_or_init_journey(self, trip: Trip, route: Route) -> MemoryEntry:
-        """Gets an existing journey entry or initialises one if it doesn't exist"""
-        key = (trip.origin, trip.destination)
-        if key not in self.journey_memory:
-            self.journey_memory[key] = []
-        entry = self.journey_entry_by_key(key, route.mode, route.path)
+    def init_route_entry(self, mode: str, path: list[int]) -> MemoryEntry:
+        """
+        Initialises a new route entry.
+        If one already exists, return it instead.
+        """
+        key = (mode, tuple(path))
+        entry = self.get_route_entry(mode, path)
         if entry is None:
-            if route.mode in ("bike", "walk"):
-                entry = ActiveMemoryEntry(route.mode, route.path)
+            if mode in ("bike", "walk"):
+                entry = ActiveMemoryEntry()
             else:
-                entry = MemoryEntry(route.mode, route.path)
-            self.journey_memory[key].append(entry)
+                entry = MemoryEntry()
+            self.route_memory[key] = entry
         return entry
 
     def store_comfort(self, road: RoadType, mode: str, comfort: int) -> None:
@@ -130,7 +122,7 @@ class TravelMemory:
             self.comfort_memory[road] = {}
         self.comfort_memory[road][mode] = comfort
 
-    def get_comfort(self, road: RoadType, mode: str) -> int:
+    def get_comfort(self, road: RoadType, mode: str) -> int | None:
         """Gets the stored comfort value for the given road type, or None"""
         if road not in self.comfort_memory or mode not in self.comfort_memory[road]:
             return None

@@ -161,10 +161,27 @@ class PersonAgent(mg.GeoAgent):
         Gets a string description of the given route.
         Includes information from any stored memories.
         """
-        #TODO: memories
-        network = self.model.get_network(route.mode)
-        est_travel_time = network.get_path_duration(route.path, self._get_speed(route.mode))
-        description = f"mode: {route.mode}, estimated travel time (minutes): {est_travel_time:.2f}"
+        route_memory = self.person.memory.get_route_entry(route.mode, route.path)
+
+        if route_memory is None:
+            network = self.model.get_network(route.mode)
+            est_travel_time = network.get_path_duration(route.path, self._get_speed(route.mode))
+            return (
+                f"mode: {route.mode}, "
+                f"not previously used, "
+                f"estimated travel time (minutes): {est_travel_time:.2f}"
+            )
+
+        description = (
+            f"mode: {route.mode}, "
+            f"previously used {route_memory.count} time(s), "
+            f"average travel time (minutes): {route_memory.travel_time:.2f}"
+        )
+        if route.mode in ("bike", "walk"):
+            description += (
+                f", on a scale of 1 (not at all comfortable) to 10 (very comfortable) "
+                f"they previously rated this route {route_memory.comfort:.1f}"
+            )
         return description
 
     def _create_route_info(self, routes: list[Route]) -> str:
@@ -207,7 +224,7 @@ class PersonAgent(mg.GeoAgent):
         start_coords = network.get_node_coords(self.route.path[0])
         self._set_position(start_coords)
 
-        self.memory_entry = self.person.memory.get_or_init_journey(self.trip, self.route)
+        self.memory_entry = self.person.memory.init_route_entry(self.route.mode, self.route.path)
 
     def _get_speed(self, mode: str) -> float:
         """
