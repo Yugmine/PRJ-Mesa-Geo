@@ -5,7 +5,8 @@ import mesa_geo as mg
 from shapely import Point
 from utils.llm import generate_response, generate_prompt
 from utils.model_time import Time
-from .routes import Trip, Route, TravelMemory, MemoryEntry, RoadType
+from .routes import Trip, Route, RoadType
+from .memory import TravelMemory, MemoryEntry
 
 class Person:
     """
