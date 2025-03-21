@@ -137,6 +137,7 @@ class TransportNetwork():
 
         if traversal_time > path_time:
             # Route completed
+            route.trim_path_to_node(route.path[-1])
             time_left = traversal_time - path_time
             return None, time_left
 

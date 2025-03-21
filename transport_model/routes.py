@@ -63,12 +63,14 @@ class MemoryEntry:
     """
     mode: str
     path: list[int]
-    travel_time: float = 0.0
-    count: int = 0
+    travel_time: float
+    count: int
 
     def __init__(self, mode: str, path: list[int]) -> None:
         self.mode = mode
         self.path = path
+        self.travel_time = 0.0
+        self.count = 0
 
     def update_travel_time(self, new_time: float) -> None:
         """
@@ -86,7 +88,11 @@ class ActiveMemoryEntry(MemoryEntry):
     
     comfort         A list of comfort values for each edge.
     """
-    comfort: list[float] = []
+    comfort: list[float]
+
+    def __init__(self, mode: str, path: list[int]) -> None:
+        self.comfort = []
+        super().__init__(mode, path)
 
     def add_comfort(self, val: int) -> None:
         """Adds a comfort value to the stored list"""

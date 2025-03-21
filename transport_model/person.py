@@ -251,14 +251,6 @@ class PersonAgent(mg.GeoAgent):
             self.location = self.trip.destination
             trip_time = self._calculate_trip_time(mins_left)
             self.memory_entry.update_travel_time(trip_time)
-
-            # debugging
-            print(self.memory_entry.mode)
-            print(self.memory_entry.travel_time)
-            print(self.memory_entry.count)
-            print(self.memory_entry.path)
-            print(self.memory_entry.comfort)
-
             self._clear_travel_info()
             self._next_plan_step()
 
