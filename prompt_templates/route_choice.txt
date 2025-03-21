@@ -1,0 +1,20 @@
+route_choice.txt
+
+Agent chooses a route to follow.
+
+are origin and destination necessary?
+
+Variables:
+<INPUT 0> -- Name
+<INPUT 1> -- Origin
+<INPUT 2> -- Destination
+<INPUT 3> -- Possible routes
+
+<END COMMENT>
+
+<INPUT 0> is planning a trip from <INPUT 1> to <INPUT 2>.
+They have the following routes available to them:
+<INPUT 3>
+Which route should they take?
+Answer first with the number of the route only, then on a newline give a short explanation from the perspective of <INPUT 0> as to why they chose the route that they did.
+Don't mention the whole route description directly in this explanation, instead only reference key information.

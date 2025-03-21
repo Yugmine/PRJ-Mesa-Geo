@@ -82,7 +82,7 @@ class ActiveMemoryEntry(MemoryEntry):
 
 class TravelMemory:
     """
-    Stores memory of previous experiences with travel..
+    Stores memory of previous experiences with travel.
     Memories can be used to influence planning + mode choice.
 
     journey_memory      Stores memories of previous journeys.

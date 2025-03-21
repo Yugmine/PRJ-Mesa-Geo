@@ -137,24 +137,77 @@ class PersonAgent(mg.GeoAgent):
         self.route = None
         self.memory_entry = None
 
-    def _plan_route(self, mode: str) -> None:
-        """
-        Plans a route for the planned trip with the given mode
-        Currently it just plans the quickest route
-        """
+    def _mode_possible_routes(self, origin: str, destination: str, mode: str) -> list[Route]:
+        """Gets some possible routes between the given locations with the given mode"""
         network = self.model.get_network(mode)
-        origin_coords = self.model.get_location_coords(self.trip.origin)
-        origin = network.get_nearest_node(origin_coords)
-        destination_coords = self.model.get_location_coords(self.trip.destination)
-        destination = network.get_nearest_node(destination_coords)
-        if origin != destination:
-            # Move the agent to the start node
-            start_coords = network.get_node_coords(origin)
-            self._set_position(start_coords)
-            # TODO: include the LLM in this process
-            path = network.plan_route(origin, destination)
-            self.route = Route(mode, path)
-            self.memory_entry = self.person.memory.get_or_init_journey(self.trip, self.route)
+        origin_coords = self.model.get_location_coords(origin)
+        origin_node = network.get_nearest_node(origin_coords)
+        destination_coords = self.model.get_location_coords(destination)
+        destination_node = network.get_nearest_node(destination_coords)
+        paths = network.plan_paths(origin_node, destination_node)
+        return [Route(mode, path) for path in paths]
+
+    def _get_candidate_routes(self, origin: str, destination: str):
+        """Get a list of reasonable routes between the origin and destination"""
+        routes = self._mode_possible_routes(origin, destination, "walk")
+        if self.person.owns_bike:
+            routes += self._mode_possible_routes(origin, destination, "bike")
+        if self.person.owns_car:
+            routes += self._mode_possible_routes(origin, destination, "drive")
+        return routes
+
+    def _get_route_description(self, route: Route) -> str:
+        """
+        Gets a string description of the given route.
+        Includes information from any stored memories.
+        """
+        #TODO: memories
+        network = self.model.get_network(route.mode)
+        est_travel_time = network.get_path_duration(route.path, self._get_speed(route.mode))
+        description = f"mode: {route.mode}, estimated travel time (minutes): {est_travel_time:.2f}"
+        return description
+
+    def _create_route_info(self, routes: list[Route]) -> str:
+        """Creates a string description for all of the given routes"""
+        route_descriptions = ""
+        for i, route in enumerate(routes):
+            line = self._get_route_description(route)
+            route_descriptions += f"{i} - {line} \n"
+        return route_descriptions
+
+    def _clean_route_choice_response(self, response: str) -> tuple[int, str]:
+        """Extracts the chosen route and justification from the raw LLM response"""
+        split_response = response.split("\n")
+        route_id = int(split_response[0])
+        justification = split_response[-1]
+        return route_id, justification
+
+    def _choose_a_route(self, origin: str, destination: str) -> Route:
+        """Gets the LLM to pick a route to travel between the given origin + destination"""
+        routes = self._get_candidate_routes(origin, destination)
+        route_info = self._create_route_info(routes)
+        system_prompt = self.person.generate_system_prompt()
+        inputs = [
+            self.person.name,
+            origin,
+            destination,
+            route_info
+        ]
+        prompt = generate_prompt(inputs, "route_choice")
+        response = generate_response(system_prompt, prompt)
+        route_id, justification = self._clean_route_choice_response(response)
+        return routes[route_id]
+
+    def _plan_route(self) -> None:
+        """Plan a route for the planned trip."""
+        self.route = self._choose_a_route(self.trip.origin, self.trip.destination)
+
+        # Move the agent to the start node
+        network = self.model.get_network(self.route.mode)
+        start_coords = network.get_node_coords(self.route.path[0])
+        self._set_position(start_coords)
+
+        self.memory_entry = self.person.memory.get_or_init_journey(self.trip, self.route)
 
     def _get_speed(self, mode: str) -> float:
         """
@@ -214,7 +267,7 @@ class PersonAgent(mg.GeoAgent):
         Args:
             old_path        The route path before we moved.
         """
-        if self.route.mode == "driving":
+        if self.route.mode == "drive":
             # Comfort for driving assumed to be invariable.
             return
 
@@ -322,7 +375,7 @@ class PersonAgent(mg.GeoAgent):
         elif self.trip is not None:
             if self.model.time == self.trip.start_time:
                 # move to the planned location
-                self._plan_route("walk")
+                self._plan_route()
         elif self.model.time == Time(4, 0):
             # Plan for the day
             self.person.plan_day()
