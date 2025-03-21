@@ -203,7 +203,8 @@ class PersonAgent(mg.GeoAgent):
         else:
             template = "walking_comfort"
         prompt = generate_prompt([self.person.name, road.highway, road.maxspeed], template)
-        return generate_response(system_prompt, prompt)
+        response = generate_response(system_prompt, prompt)
+        return int(response)
 
     def _remember_comfort(self, old_path: list[int]) -> None:
         """
@@ -223,12 +224,14 @@ class PersonAgent(mg.GeoAgent):
 
         # For every edge, store a comfort value
         for i in range(len(nodes) - 1):
-            road = self._get_road_type(network.edge_info(nodes[i], nodes[i + 1]))
+            edge_info = network.edge_info(nodes[i], nodes[i + 1])
+            road = self._get_road_type(edge_info)
             comfort = self.person.memory.get_comfort(road, self.route.mode)
             if comfort is None:
                 comfort = self._get_comfort(road, self.route.mode)
                 self.person.memory.store_comfort(road, self.route.mode, comfort)
-            self.memory_entry.add_comfort(comfort)
+            length = edge_info["length"]
+            self.memory_entry.add_comfort(comfort, length)
 
     def _follow_route(self) -> None:
         """Move along the planned route"""
@@ -250,7 +253,7 @@ class PersonAgent(mg.GeoAgent):
             new_position = self.model.get_location_coords(self.trip.destination)
             self.location = self.trip.destination
             trip_time = self._calculate_trip_time(mins_left)
-            self.memory_entry.update_travel_time(trip_time)
+            self.memory_entry.complete_memory(trip_time)
             self._clear_travel_info()
             self._next_plan_step()
 
