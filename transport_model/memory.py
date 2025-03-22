@@ -1,6 +1,21 @@
 """Memory used to store the agents' past experiences with travel"""
+from dataclasses import dataclass
 from typing import override
+from utils.model_time import Time
 from .routes import RoadType
+
+@dataclass
+class ModeChoice:
+    """
+    Stores information about a mode choice the LLM has made.
+    """
+    day: int
+    time: Time
+    origin: str
+    destination: str
+    mode: str
+    justification: str
+
 
 class MemoryEntry:
     """
@@ -83,13 +98,16 @@ class TravelMemory:
                         Uses the form (mode, path) : entry
     comfort_memory      Caches comfort values generated for the given road type.
                         Uses the form RoadType: {mode: comfort}
+    justifications      Stores justifications for mode choices.
     """
     route_memory: dict[tuple[str, tuple[int, ...]], MemoryEntry]
     comfort_memory: dict[RoadType, dict[str, int]]
+    justifications: list[ModeChoice]
 
     def __init__(self) -> None:
         self.route_memory = {}
         self.comfort_memory = {}
+        self.justifications = []
 
     def get_route_entry(self, mode: str, path: list[int]) -> MemoryEntry | None:
         """
@@ -127,3 +145,7 @@ class TravelMemory:
         if road not in self.comfort_memory or mode not in self.comfort_memory[road]:
             return None
         return self.comfort_memory[road][mode]
+
+    def store_mode_choice(self, choice: ModeChoice) -> None:
+        """Stores the given mode choice"""
+        self.justifications.append(choice)

@@ -66,3 +66,7 @@ class Time:
             time_after_midnight = (60 * end.hour) + end.minute
             return time_before_midnight + time_after_midnight
         return (60 * (end.hour - self.hour)) + (end.minute - self.minute)
+
+    def copy(self) -> 'Time':
+        """Creates a copy of this object"""
+        return Time(self.hour, self.minute)

@@ -6,7 +6,7 @@ from shapely import Point
 from utils.llm import generate_response, generate_prompt
 from utils.model_time import Time
 from .routes import Trip, Route, RoadType
-from .memory import TravelMemory, MemoryEntry
+from .memory import TravelMemory, MemoryEntry, ModeChoice
 
 class Person:
     """
@@ -213,7 +213,17 @@ class PersonAgent(mg.GeoAgent):
         prompt = generate_prompt(inputs, "route_choice")
         response = generate_response(system_prompt, prompt)
         route_id, justification = self._clean_route_choice_response(response)
-        return routes[route_id]
+        route_chosen = routes[route_id]
+        choice = ModeChoice(
+            day = self.model.day,
+            time = self.model.time.copy(),
+            origin = origin,
+            destination = destination,
+            mode = route_chosen.mode,
+            justification = justification
+        )
+        self.person.memory.store_mode_choice(choice)
+        return route_chosen
 
     def _plan_route(self) -> None:
         """Plan a route for the planned trip."""

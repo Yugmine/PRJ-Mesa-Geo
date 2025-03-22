@@ -16,5 +16,5 @@ Variables:
 They have the following routes available to them:
 <INPUT 3>
 Which route should they take?
-Answer first with the number of the route only, then on a newline give a short explanation from the perspective of <INPUT 0> as to why they chose the route that they did.
+Answer first with the number of the route only, then on a newline give a single-sentence explanation from the perspective of <INPUT 0> as to why they chose the route that they did.
 Don't mention the whole route description directly in this explanation, instead only reference key information.

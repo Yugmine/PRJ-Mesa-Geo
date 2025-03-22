@@ -4,7 +4,7 @@ from mesa.visualization import make_plot_component
 from transport_model.model import TransportModel
 from transport_model.geo_agents import Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from transport_model.person import PersonAgent
-from utils.viz_components import selected_agent_card, model_info
+from utils.viz_components import info_panel
 from utils.custom_geospace_component import make_geospace_component
 from utils.custom_solara_viz import SolaraViz
 
@@ -52,9 +52,8 @@ page = SolaraViz(
     model_params=model_params,
     components=[
         make_geospace_component(draw),
-        selected_agent_card,
+        info_panel,
         mode_plot,
-        model_info
     ],
 )
 # This is required to render the visualization in the Jupyter notebook
