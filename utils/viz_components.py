@@ -47,7 +47,10 @@ def agent_mode_choice_view(agent: PersonAgent) -> solara.Details:
     """Displays justifications given for mode choices"""
     lines = []
     for choice in agent.person.memory.justifications:
-        context = solara.Markdown(f"**Day {choice.day} {choice.time}  -  {choice.origin} > {choice.destination} ({choice.mode})**")
+        context = solara.Markdown((
+            f"**Day {choice.day} {choice.time}  -  "
+            f"{choice.origin} > {choice.destination} ({choice.mode})**"
+        ))
         justification = solara.Text(choice.justification)
         lines.append(solara.Column(children=[context, justification]))
     all_choices = solara.Column(children=lines)
@@ -96,5 +99,3 @@ def info_panel(model: TransportModel) -> solara.Column:
         model_info(model),
         selected_agent_card(model)
     ])
-
-# justification view !!
