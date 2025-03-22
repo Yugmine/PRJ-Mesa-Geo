@@ -234,6 +234,10 @@ class PersonAgent(mg.GeoAgent):
         start_coords = network.get_node_coords(self.route.path[0])
         self._set_position(start_coords)
 
+        # Give negative offset if we start moving in the middle of a time step
+        time_to_start = self.model.time.time_to(self.trip.start_time)
+        self.route.set_offset(self.model.time_step - time_to_start)
+
         self.memory_entry = self.person.memory.init_route_entry(self.route.mode, self.route.path)
 
     def _get_speed(self, mode: str) -> float:
@@ -255,7 +259,7 @@ class PersonAgent(mg.GeoAgent):
             mins_left       How many minutes are left in the current time step
                             (after the trip finished).
         """
-        end_time = self.model.time.n_mins_from_now(mins_left)
+        end_time = self.model.time.n_mins_from_now(self.model.time_step - mins_left)
         return self.trip.start_time.time_to(end_time)
 
     def _handle_list_attrs(self, attr: str | list) -> str:
@@ -400,10 +404,12 @@ class PersonAgent(mg.GeoAgent):
         if self.is_travelling():
             self._follow_route()
         elif self.trip is not None:
-            if self.model.time == self.trip.start_time:
-                # move to the planned location
+            # Plan the trip in the timestep before the trip starts.
+            # < 2 * to handle the case where we plan to start in the middle of a time step.
+            # e.g. time_step = 5 and trip starting at 10:12, plan at 10:05.
+            if self.model.time.time_to(self.trip.start_time) < 2 * self.model.time_step:
                 self._plan_route()
-        elif self.model.time == Time(4, 0):
+        elif self.model.time.time_to(Time(4, 0)) < self.model.time_step:
             # Plan for the day
             self.person.plan_day()
             self._next_plan_step()

@@ -57,10 +57,11 @@ class Time:
 
     def time_to(self, end: 'Time') -> float:
         """
-        Calculates the time from this time to the provided time
-        Assumes difference < 24 hours
+        Calculates the time from this time to the provided time (in minutes)
+        Only looks forwards (e.g. if this time is 16:30 and end is 16:15, returns 1425).
+        Assumes difference < 24 hours.
         """
-        if end.hour < self.hour:
+        if end.hour < self.hour or (end.hour == self.hour and end.minute < self.minute):
             # We've rolled over to tomorrow
             time_before_midnight = (60 * (23 - self.hour)) + (60 - self.minute)
             time_after_midnight = (60 * end.hour) + end.minute
