@@ -134,6 +134,10 @@ class TravelMemory:
             self.route_memory[key] = entry
         return entry
 
+    def route_is_stored(self, mode: str, path: list[int]) -> bool:
+        """Returns True if the given route is stored in memory, False otherwise"""
+        return self.get_route_entry(mode, path) is not None
+
     def store_comfort(self, road: RoadType, mode: str, comfort: int) -> None:
         """Stores the given comfort value"""
         if road not in self.comfort_memory:

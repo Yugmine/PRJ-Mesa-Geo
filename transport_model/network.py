@@ -1,7 +1,7 @@
 """Handles transport networks and operations on them"""
 from typing import override
 from dataclasses import dataclass
-from itertools import islice
+from collections.abc import Iterator
 import osmnx as ox
 import networkx as nx
 from sklearn.neighbors import KDTree
@@ -158,8 +158,8 @@ class TransportNetwork():
         """Get the time taken to traverse the given edge"""
         raise NotImplementedError("Implemented in subclass")
 
-    def plan_paths(self, source: int, target: int) -> list[list[int]]:
-        """Plans multiple paths from the source node to the target node"""
+    def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
+        """Returns an iterator of paths from the source node to the target node"""
         raise NotImplementedError("Implemented in subclass")
 
 class DriveNetwork(TransportNetwork):
@@ -214,12 +214,11 @@ class DriveNetwork(TransportNetwork):
         return ((attrs["length"] / 1000) / car_speed) * 60
 
     @override
-    def plan_paths(self, source: int, target: int) -> list[list[int]]:
-        """Plans multiple paths from the source node to the target node"""
+    def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
+        """Returns an iterator of paths from the source node to the target node"""
         digraph = ox.convert.to_digraph(self.graph)
         paths = nx.shortest_simple_paths(digraph, source, target, weight=self._weight_func)
-        num_paths = 3
-        return list(islice(paths, num_paths))
+        return paths
 
 class ActiveNetwork(TransportNetwork):
     """Network for active travel (walking + cycling)"""
@@ -233,12 +232,11 @@ class ActiveNetwork(TransportNetwork):
         return ((attrs["length"] / 1000) / speed) * 60
 
     @override
-    def plan_paths(self, source: int, target: int) -> list[list[int]]:
-        """Plans multiple paths from the source node to the target node"""
+    def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
+        """Returns an iterator of paths from the source node to the target node"""
         digraph = ox.convert.to_digraph(self.graph)
         paths = nx.shortest_simple_paths(digraph, source, target, weight="length")
-        num_paths = 3
-        return list(islice(paths, num_paths))
+        return paths
 
 class WalkNetwork(ActiveNetwork):
     """Network for walking"""

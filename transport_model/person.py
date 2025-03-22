@@ -138,17 +138,22 @@ class PersonAgent(mg.GeoAgent):
         self.memory_entry = None
 
     def _mode_possible_routes(self, origin: str, destination: str, mode: str) -> list[Route]:
-        """Gets some possible routes between the given locations with the given mode"""
+        """Returns a list of all routes we've taken before + 1 new one for the given mode"""
         network = self.model.get_network(mode)
         origin_coords = self.model.get_location_coords(origin)
         origin_node = network.get_nearest_node(origin_coords)
         destination_coords = self.model.get_location_coords(destination)
         destination_node = network.get_nearest_node(destination_coords)
         paths = network.plan_paths(origin_node, destination_node)
-        return [Route(mode, path) for path in paths]
+        routes = []
+        for path in paths:
+            routes.append(Route(mode, path))
+            if not self.person.memory.route_is_stored(mode, path):
+                break
+        return routes
 
     def _get_candidate_routes(self, origin: str, destination: str):
-        """Get a list of reasonable routes between the origin and destination"""
+        """Get a list of possible routes between the origin and destination."""
         routes = self._mode_possible_routes(origin, destination, "walk")
         if self.person.owns_bike:
             routes += self._mode_possible_routes(origin, destination, "bike")
