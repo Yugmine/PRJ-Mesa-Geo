@@ -283,6 +283,8 @@ class PersonAgent(mg.GeoAgent):
             maxspeed = "n/a"
         else:
             maxspeed = self._handle_list_attrs(attrs["maxspeed"])
+        if "extra_info" in attrs:
+            return RoadType(highway, maxspeed, attrs["extra_info"])
         return RoadType(highway, maxspeed)
 
     def _get_comfort(self, road: RoadType, mode: str) -> int:
@@ -292,7 +294,13 @@ class PersonAgent(mg.GeoAgent):
             template = "cyclist_comfort"
         else:
             template = "walking_comfort"
-        prompt = generate_prompt([self.person.name, road.highway, road.maxspeed], template)
+        inputs = [
+            self.person.name,
+            road.highway,
+            road.maxspeed,
+            road.info
+        ]
+        prompt = generate_prompt(inputs, template)
         response = generate_response(system_prompt, prompt)
         return int(response)
 

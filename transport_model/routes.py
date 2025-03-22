@@ -45,9 +45,11 @@ class RoadType:
 
     highway         The road class e.g. "primary"
     maxspeed        The speed limit e.g. "40 mph"
+    info            Any relevant natural language information about the road
     """
     highway: str
     maxspeed: str
+    info: str = "n/a"
 
     def __hash__(self):
-        return hash((self.highway, self.maxspeed))
+        return hash((self.highway, self.maxspeed, self.info))

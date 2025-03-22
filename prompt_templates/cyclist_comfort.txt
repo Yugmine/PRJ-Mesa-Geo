@@ -6,6 +6,7 @@ Variables:
 <INPUT 0> -- Name
 <INPUT 1> -- Road class
 <INPUT 2> -- Speed limit
+<INPUT 3> -- Extra info
 
 <END COMMENT>
 
@@ -14,3 +15,4 @@ Answer with only a number.
 
 Road class: <INPUT 1>
 Speed limit: <INPUT 2>
+Extra info: <INPUT 3>

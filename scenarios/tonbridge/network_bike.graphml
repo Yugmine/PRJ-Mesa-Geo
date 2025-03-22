@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!-- Hadlow Road (osmid 4913977) has had separated bicycle lanes added -->
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d25" for="edge" attr.name="extra_info" attr.type="string" />
   <key id="d24" for="edge" attr.name="tunnel" attr.type="string" />
   <key id="d23" for="edge" attr.name="width" attr.type="string" />
   <key id="d22" for="edge" attr.name="est_width" attr.type="string" />
@@ -18105,6 +18107,7 @@
       <data key="d14">True</data>
       <data key="d15">66.89523500992873</data>
       <data key="d16">LINESTRING (0.2880147 51.2037998, 0.2884476 51.2040402, 0.2885104 51.204075, 0.2887336 51.2041986)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="32135284" target="32135562" id="0">
       <data key="d8">[1185126337, 1262221441]</data>
@@ -22021,6 +22024,7 @@
       <data key="d14">False</data>
       <data key="d15">67.58971622343643</data>
       <data key="d16">LINESTRING (0.2894657 51.2045966, 0.2890978 51.2044138, 0.2887336 51.2041986)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="32150011" target="292970359" id="0">
       <data key="d8">4913977</data>
@@ -22033,6 +22037,7 @@
       <data key="d14">True</data>
       <data key="d15">43.11833750621955</data>
       <data key="d16">LINESTRING (0.2894657 51.2045966, 0.2899182 51.2048418, 0.2899388 51.2048427)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="32150117" target="32150011" id="0">
       <data key="d8">4913932</data>
@@ -22062,6 +22067,7 @@
       <data key="d14">False</data>
       <data key="d15">107.3656615470427</data>
       <data key="d16">LINESTRING (0.2910581 51.2055039, 0.2907079 51.20527, 0.2906699 51.2052385, 0.2899388 51.2048427)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="32150220" target="32151707" id="0">
       <data key="d8">4913977</data>
@@ -22074,6 +22080,7 @@
       <data key="d14">True</data>
       <data key="d15">151.5975804565187</data>
       <data key="d16">LINESTRING (0.2910581 51.2055039, 0.2915945 51.2059005, 0.2919854 51.2061214, 0.2924333 51.2062953, 0.2927117 51.2063525)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="32150580" target="32135563" id="0">
       <data key="d8">4913938</data>
@@ -22380,6 +22387,7 @@
       <data key="d14">False</data>
       <data key="d15">151.5975804565187</data>
       <data key="d16">LINESTRING (0.2927117 51.2063525, 0.2924333 51.2062953, 0.2919854 51.2061214, 0.2915945 51.2059005, 0.2910581 51.2055039)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="32151707" target="32153224" id="0">
       <data key="d8">4914033</data>
@@ -35897,6 +35905,7 @@
       <data key="d14">False</data>
       <data key="d15">66.89523500992873</data>
       <data key="d16">LINESTRING (0.2887336 51.2041986, 0.2885104 51.204075, 0.2884476 51.2040402, 0.2880147 51.2037998)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="292970300" target="32150011" id="0">
       <data key="d8">4913977</data>
@@ -35909,6 +35918,7 @@
       <data key="d14">True</data>
       <data key="d15">67.58971622343643</data>
       <data key="d16">LINESTRING (0.2887336 51.2041986, 0.2890978 51.2044138, 0.2894657 51.2045966)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="292970300" target="292970359" id="0">
       <data key="d8">26712900</data>
@@ -35931,6 +35941,7 @@
       <data key="d14">False</data>
       <data key="d15">43.11833750621955</data>
       <data key="d16">LINESTRING (0.2899388 51.2048427, 0.2899182 51.2048418, 0.2894657 51.2045966)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="292970359" target="32150220" id="0">
       <data key="d8">4913977</data>
@@ -35943,6 +35954,7 @@
       <data key="d14">True</data>
       <data key="d15">107.36566154704272</data>
       <data key="d16">LINESTRING (0.2899388 51.2048427, 0.2906699 51.2052385, 0.2907079 51.20527, 0.2910581 51.2055039)</data>
+      <data key="d25">Road has separated bicycle lanes</data>
     </edge>
     <edge source="292970359" target="292970300" id="0">
       <data key="d8">26712900</data>
