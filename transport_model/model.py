@@ -15,7 +15,10 @@ from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
 
 def get_num_agents_by_mode(model: mesa.Model, mode: str) -> int:
     """Returns the number of agents currently travelling by the given mode"""
-    agents = [agent for agent in model.agents_by_type[PersonAgent] if agent.get_current_mode() == mode]
+    agents = [
+        agent for agent in model.agents_by_type[PersonAgent]
+        if agent.get_current_mode() == mode
+    ]
     return len(agents)
 
 class TransportModel(mesa.Model):
@@ -27,18 +30,31 @@ class TransportModel(mesa.Model):
     drive_network: DriveNetwork
     walk_network: WalkNetwork
     bike_network: BikeNetwork
+    global_info: str
     selected_agent: PersonAgent
     day: int
     time: Time
     time_step: int
+    default_speed_limit: int
+    car_speed_factor: float
     datacollector: mesa.DataCollector
 
-    def __init__(self, scenario: str, time_step: int = 5) -> None:
+    def __init__(
+        self,
+        scenario: str,
+        time_step: int = 5,
+        default_speed_limit: int = 30,
+        car_speed_factor: float = 0.75
+    ) -> None:
         """
         Constructor for the model
 
-        scenario    Gives the name of the scenario (which should be located in the scenarios folder)
-        time_step   The number of minutes that should pass in every model step
+        scenario                Gives the name of the scenario
+                                (which should be located in the scenarios folder).
+        time_step               The number of minutes that should pass in every model step.
+        default_speed_limit     The speed limit (in km/h) applied to roads
+                                with no defined speed limit.
+        car_speed_factor        Multiplied by speed limit to get the speed a car will travel at.
         """
         super().__init__()
 
@@ -46,10 +62,16 @@ class TransportModel(mesa.Model):
         self.day = 1
         self.time = Time(4, 0)
         self.time_step = time_step
+        self.default_speed_limit = default_speed_limit
+        self.car_speed_factor = car_speed_factor
 
         self.space = mg.GeoSpace(crs=self.CRS, warn_crs_conversion=False)
 
-        self.drive_network = DriveNetwork(self._get_network("drive"))
+        self.drive_network = DriveNetwork(
+            self._get_network("drive"),
+            default_speed_limit,
+            car_speed_factor
+        )
         self.walk_network = WalkNetwork(self._get_network("walk"))
         self.bike_network = BikeNetwork(self._get_network("bike"))
 
@@ -58,6 +80,7 @@ class TransportModel(mesa.Model):
         self._load_locations()
         self._load_people()
         self._load_areas()
+        self._load_info()
         self.selected_agent = None
 
         self.datacollector = mesa.DataCollector(
@@ -114,6 +137,12 @@ class TransportModel(mesa.Model):
         self._load_area_type(areas, ResidentialArea, "residential")
         self._load_area_type(areas, RetailArea, "retail")
         self._load_area_type(areas, IndustrialArea, "industrial")
+
+    def _load_info(self) -> None:
+        """Loads global info (e.g. vehicle mileage tax) for the simulation"""
+        info_path = os.path.join(self.scenario_path, "global_info.txt")
+        with open (info_path, "r", encoding="utf-8") as file:
+            self.global_info = file.read()
 
     def _update_clock(self):
         """Updates the simulation clock by the specified time step"""

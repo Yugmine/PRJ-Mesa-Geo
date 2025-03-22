@@ -166,12 +166,21 @@ class DriveNetwork(TransportNetwork):
     """
     Network for driving
     
-    DEFAULT_LIMIT       The speed limit (in km/h) applied to a road without a defined speed limit
-    SPEED_FACTOR        When assuming the speed a car will travel,
-                        multiply the speed limit by this factor.
+    default_limit       The speed limit (in km/h) applied to roads with no defined speed limit.
+    speed_factor        Multiplied by speed limit to get the speed a car will travel at.
     """
-    DEFAULT_LIMIT = 30
-    SPEED_FACTOR = 0.75
+    default_limit: int
+    speed_factor: float
+
+    def __init__(
+        self,
+        graph: nx.MultiDiGraph,
+        default_limit: int,
+        speed_factor: float
+    ) -> None:
+        self.default_limit = default_limit
+        self.speed_factor = speed_factor
+        super().__init__(graph)
 
     def _get_num_limit(self, limit: str) -> float:
         """
@@ -187,7 +196,7 @@ class DriveNetwork(TransportNetwork):
     def _get_speed_limit(self, attrs: dict) -> float:
         """Extracts the speed limit from the provided attribute dict"""
         if "maxspeed" not in attrs:
-            return self.DEFAULT_LIMIT
+            return self.default_limit
 
         limit = attrs["maxspeed"]
         # Some edges have two speed limits (where the limit changes I assume)
@@ -210,7 +219,7 @@ class DriveNetwork(TransportNetwork):
         speed is not used in this function (speed is calculated based on the speed limit)
         """
         speed_limit = self._get_speed_limit(attrs)
-        car_speed = speed_limit * self.SPEED_FACTOR
+        car_speed = speed_limit * self.speed_factor
         return ((attrs["length"] / 1000) / car_speed) * 60
 
     @override

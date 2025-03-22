@@ -72,18 +72,19 @@ class Person:
 
         self.daily_plan = cleaned_plan
 
-    def generate_system_prompt(self) -> str:
+    def generate_system_prompt(self, global_info: str) -> str:
         """Generates the system prompt for this person"""
         inputs = [
             self.name,
             self.home,
-            self.description
+            self.description,
+            global_info
         ]
         return generate_prompt(inputs, "system_prompt")
 
-    def plan_day(self) -> None:
+    def plan_day(self, global_info: str) -> None:
         """Generates a plan for this agent's day using the LLM"""
-        system_prompt = self.generate_system_prompt()
+        system_prompt = self.generate_system_prompt(global_info)
         prompt = generate_prompt([self.name], "daily_planning")
         response = generate_response(system_prompt, prompt)
         self._break_down_plan(response)
@@ -208,7 +209,7 @@ class PersonAgent(mg.GeoAgent):
         """Gets the LLM to pick a route to travel between the given origin + destination"""
         routes = self._get_candidate_routes(origin, destination)
         route_info = self._create_route_info(routes)
-        system_prompt = self.person.generate_system_prompt()
+        system_prompt = self.person.generate_system_prompt(self.model.global_info)
         inputs = [
             self.person.name,
             origin,
@@ -289,7 +290,7 @@ class PersonAgent(mg.GeoAgent):
 
     def _get_comfort(self, road: RoadType, mode: str) -> int:
         """Gets a comfort value for the provided road type and mode"""
-        system_prompt = self.person.generate_system_prompt()
+        system_prompt = self.person.generate_system_prompt(self.model.global_info)
         if mode == "bike":
             template = "cyclist_comfort"
         else:
@@ -370,7 +371,7 @@ class PersonAgent(mg.GeoAgent):
     def _get_action_location(self, action: str) -> str:
         """Gets the location to perform the given action"""
         prompt = self._generate_location_prompt(action)
-        system_prompt = self.person.generate_system_prompt()
+        system_prompt = self.person.generate_system_prompt(self.model.global_info)
 
         for _ in range (3):
             action_location = generate_response(system_prompt, prompt)
@@ -424,5 +425,5 @@ class PersonAgent(mg.GeoAgent):
                 self._plan_route()
         elif self.model.time.time_to(Time(4, 0)) < self.model.time_step:
             # Plan for the day
-            self.person.plan_day()
+            self.person.plan_day(self.model.global_info)
             self._next_plan_step()

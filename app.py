@@ -42,6 +42,8 @@ model_params = {
         "max": 15,
         "step": 1,
     },
+    "default_speed_limit": 30,
+    "car_speed_factor": 0.75,
 }
 
 transport_model = TransportModel(model_params["scenario"])

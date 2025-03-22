@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<!-- Hadlow Road (osmid 4913977) has had separated bicycle lanes added -->
+<!-- Part of Hadlow Road (osmid 4913977) has had separated bicycle lanes added -->
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
   <key id="d25" for="edge" attr.name="extra_info" attr.type="string" />
   <key id="d24" for="edge" attr.name="tunnel" attr.type="string" />
