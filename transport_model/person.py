@@ -358,12 +358,20 @@ class PersonAgent(mg.GeoAgent):
 
         self._set_position(new_position)
 
+    def _get_location_list(self) -> str:
+        """Gets a list of locations to give to the LLM"""
+        locations = {k: v for k, v in self.model.locations.items() if v["description"] != "House"}
+        lines = [f"{self.person.home} - their home"]
+        for name in locations.keys():
+            lines.append(f"{name} - {locations[name]["description"]}")
+        return "\n".join(lines)
+
     def _generate_location_prompt(self, action: str) -> str:
         """Fills the prompt template for getting the location for an action"""
         inputs = [
             self.person.name,
             self.location,
-            self.model.get_location_names(),
+            self._get_location_list(),
             action
         ]
         return generate_prompt(inputs, "action_location")

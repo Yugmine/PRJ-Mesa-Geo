@@ -156,10 +156,6 @@ class TransportModel(mesa.Model):
         lat = self.locations[loc_name]["lat"]
         return long, lat
 
-    def get_location_names(self) -> list[str]:
-        """Returns a list of the name of every location"""
-        return list(self.locations.keys())
-
     def is_location(self, location: str) -> bool:
         """Checks if the provided location is in the environment"""
         return location in self.locations.keys()
