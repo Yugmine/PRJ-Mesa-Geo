@@ -7,9 +7,14 @@ Variables:
 <INPUT 0> -- Name
 <INPUT 1> -- Home
 <INPUT 2> -- Description
+<INPUT 3> -- Global info
 
 <END COMMENT>
 
-Name: <INPUT 0>
-Home: <INPUT 1>
-Description: <INPUT 2>
+Agent information:
+Name - <INPUT 0>
+Home - <INPUT 1>
+Description - <INPUT 2>
+
+World information:
+<INPUT 3>

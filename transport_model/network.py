@@ -1,6 +1,7 @@
 """Handles transport networks and operations on them"""
 from typing import override
 from dataclasses import dataclass
+from collections.abc import Iterator
 import osmnx as ox
 import networkx as nx
 from sklearn.neighbors import KDTree
@@ -29,18 +30,6 @@ class TransportNetwork():
         node_positions = [(node[1]["x"], node[1]["y"]) for node in self.graph.nodes.data()]
         self.kd_tree = KDTree(node_positions)
 
-    def _get_path_duration(self, path: list[int], speed: float = None) -> float:
-        """
-        Gets the length of the provided path (in minutes)
-        
-        speed is optional and only used for walking + cycling
-        """
-        total_time = 0
-        for i in range(len(path) - 1):
-            edge_info = self.graph.get_edge_data(path[i], path[i + 1])[0]
-            total_time += self._get_edge_time(edge_info, speed)
-        return total_time
-
     def _get_final_edge(
             self,
             path: list[int],
@@ -59,7 +48,7 @@ class TransportNetwork():
         """
         cumulative_time = 0
         for i in range(len(path) - 1):
-            edge_data = self.graph.get_edge_data(path[i], path[i + 1])[0]
+            edge_data = self.edge_info(path[i], path[i + 1])
             edge_time = self._get_edge_time(edge_data, speed)
             if cumulative_time + edge_time > time:
                 time_along_edge = time - cumulative_time
@@ -78,7 +67,7 @@ class TransportNetwork():
         Gets the edge geometry for the provided edge,
         or creates a line if it doesn't have any set geometry.
         """
-        edge_data = self.graph.get_edge_data(edge.u, edge.v)[0]
+        edge_data = self.edge_info(edge.u, edge.v)
 
         if "geometry" in edge_data:
             return edge_data["geometry"]
@@ -99,6 +88,18 @@ class TransportNetwork():
         interpolation_dist =  progress * geometry.length
         new_point = geometry.interpolate(interpolation_dist)
         return (new_point.x, new_point.y)
+
+    def get_path_duration(self, path: list[int], speed: float = None) -> float:
+        """
+        Gets the length of the provided path (in minutes)
+        
+        speed is optional and only used for walking + cycling
+        """
+        total_time = 0
+        for i in range(len(path) - 1):
+            edge_info = self.edge_info(path[i], path[i + 1])
+            total_time += self._get_edge_time(edge_info, speed)
+        return total_time
 
     def get_nearest_node(self, coords: tuple[float, float]) -> int:
         """Gets the id of the nearest node in the road network to the provided point"""
@@ -132,11 +133,12 @@ class TransportNetwork():
             (e.g. if step is 5 mins and it only needs to move for
             3 mins to finish, return 2 mins)
         """
-        path_time = self._get_path_duration(route.path, speed)
+        path_time = self.get_path_duration(route.path, speed)
         traversal_time = time_step + route.path_offset
 
         if traversal_time > path_time:
             # Route completed
+            route.trim_path_to_node(route.path[-1])
             time_left = traversal_time - path_time
             return None, time_left
 
@@ -148,21 +150,37 @@ class TransportNetwork():
         new_location = self._get_point_along_edge(edge, progress)
         return new_location, 0.0
 
+    def edge_info(self, edge_u, edge_v) -> dict:
+        """Gets information for the provided edge"""
+        return self.graph.get_edge_data(edge_u, edge_v)[0]
+
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """Get the time taken to traverse the given edge"""
         raise NotImplementedError("Implemented in subclass")
 
-    def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
-        """Plan a route from the source node to the target node"""
+    def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
+        """Returns an iterator of paths from the source node to the target node"""
         raise NotImplementedError("Implemented in subclass")
 
 class DriveNetwork(TransportNetwork):
     """
     Network for driving
     
-    DEFAULT_LIMIT is the speed limit (in km/h) applied to a road without a defined speed limit
+    default_limit       The speed limit (in km/h) applied to roads with no defined speed limit.
+    speed_factor        Multiplied by speed limit to get the speed a car will travel at.
     """
-    DEFAULT_LIMIT = 30
+    default_limit: int
+    speed_factor: float
+
+    def __init__(
+        self,
+        graph: nx.MultiDiGraph,
+        default_limit: int,
+        speed_factor: float
+    ) -> None:
+        self.default_limit = default_limit
+        self.speed_factor = speed_factor
+        super().__init__(graph)
 
     def _get_num_limit(self, limit: str) -> float:
         """
@@ -178,7 +196,7 @@ class DriveNetwork(TransportNetwork):
     def _get_speed_limit(self, attrs: dict) -> float:
         """Extracts the speed limit from the provided attribute dict"""
         if "maxspeed" not in attrs:
-            return self.DEFAULT_LIMIT
+            return self.default_limit
 
         limit = attrs["maxspeed"]
         # Some edges have two speed limits (where the limit changes I assume)
@@ -188,9 +206,9 @@ class DriveNetwork(TransportNetwork):
             return sum(num_limits) / len(limit)
         return self._get_num_limit(limit)
 
-    def _astar_weight(self, u: int, v: int, attrs: dict) -> float:
-        """Wrapper to match expected function signature for astar weight function"""
-        return self._get_edge_time(attrs[0])
+    def _weight_func(self, u: int, v: int, attrs: dict) -> float:
+        """Wrapper to match expected function signature for weight function"""
+        return self._get_edge_time(attrs)
 
     @override
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
@@ -198,15 +216,18 @@ class DriveNetwork(TransportNetwork):
         Calculates how long (in minutes) it would take to traverse
         a link travelling at the speed limit.
 
-        speed is not used in this function (speed is assumed to be at the limit on any edge)
+        speed is not used in this function (speed is calculated based on the speed limit)
         """
         speed_limit = self._get_speed_limit(attrs)
-        return ((attrs["length"] / 1000) / speed_limit) * 60
+        car_speed = speed_limit * self.speed_factor
+        return ((attrs["length"] / 1000) / car_speed) * 60
 
     @override
-    def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
-        """Plans a driving route from the source node to the target node"""
-        return nx.astar_path(self.graph, source, target, weight=self._astar_weight)
+    def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
+        """Returns an iterator of paths from the source node to the target node"""
+        digraph = ox.convert.to_digraph(self.graph)
+        paths = nx.shortest_simple_paths(digraph, source, target, weight=self._weight_func)
+        return paths
 
 class ActiveNetwork(TransportNetwork):
     """Network for active travel (walking + cycling)"""
@@ -220,9 +241,11 @@ class ActiveNetwork(TransportNetwork):
         return ((attrs["length"] / 1000) / speed) * 60
 
     @override
-    def plan_route(self, source: int, target: int) -> list[tuple[int, int]]:
-        """Plans a route from the source node to the target node"""
-        return nx.astar_path(self.graph, source, target, weight="length")
+    def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
+        """Returns an iterator of paths from the source node to the target node"""
+        digraph = ox.convert.to_digraph(self.graph)
+        paths = nx.shortest_simple_paths(digraph, source, target, weight="length")
+        return paths
 
 class WalkNetwork(ActiveNetwork):
     """Network for walking"""

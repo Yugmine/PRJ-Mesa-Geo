@@ -43,6 +43,22 @@ def agent_plan_view(agent: PersonAgent) -> solara.Details:
         children=[content]
     )
 
+def agent_mode_choice_view(agent: PersonAgent) -> solara.Details:
+    """Displays justifications given for mode choices"""
+    lines = []
+    for choice in agent.person.memory.justifications:
+        context = solara.Markdown((
+            f"**Day {choice.day} {choice.time}  -  "
+            f"{choice.origin} > {choice.destination} ({choice.mode})**"
+        ))
+        justification = solara.Text(choice.justification)
+        lines.append(solara.Column(children=[context, justification]))
+    all_choices = solara.Column(children=lines)
+    return solara.Details(
+        summary="Mode choice justifications:",
+        children=[all_choices]
+    )
+
 def selected_agent_card(model: TransportModel) -> solara.Card:
     """Card showing information on the selected agent"""
     agent = model.selected_agent
@@ -52,7 +68,8 @@ def selected_agent_card(model: TransportModel) -> solara.Card:
     components = solara.Column(children=[
         agent_mode_view(agent),
         agent_trip_view(agent),
-        agent_plan_view(agent)
+        agent_plan_view(agent),
+        agent_mode_choice_view(agent)
     ])
 
     card = solara.Card(
@@ -61,18 +78,24 @@ def selected_agent_card(model: TransportModel) -> solara.Card:
     )
     return card
 
-def clock_text(model: TransportModel) -> solara.Text:
-    """Text showing the current simulated time"""
-    return solara.Text(f"Day: {model.day} {model.time}")
-
 def model_info(model: TransportModel) -> solara.Column:
     """Displays global information about the model"""
     num_agents = len(model.agents_by_type[PersonAgent])
     num_travelling = len(
         [agent for agent in model.agents_by_type[PersonAgent] if agent.is_travelling()]
     )
-    return solara.Column(children=[
-        clock_text(model),
+    agent_counts = solara.Column(children=[
         solara.Text(f"{num_agents} Agent(s) Total"),
         solara.Text(f"{num_travelling} Agent(s) Travelling")
+    ])
+    return solara.Card(
+        title=f"Day: {model.day} {model.time}",
+        children=[agent_counts]
+    )
+
+def info_panel(model: TransportModel) -> solara.Column:
+    """Displays model information"""
+    return solara.Column(children=[
+        model_info(model),
+        selected_agent_card(model)
     ])

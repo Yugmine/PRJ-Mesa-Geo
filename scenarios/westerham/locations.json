@@ -1,0 +1,452 @@
+{
+    "The George and Dragon": {
+        "lat": 51.2672337,
+        "long": 0.0714266,
+        "description": "amenity type: pub"
+    },
+    "Costa": {
+        "lat": 51.2671732,
+        "long": 0.0719743,
+        "description": "amenity type: cafe, cuisine: coffee_shop"
+    },
+    "Deli Di Luca": {
+        "lat": 51.2672244,
+        "long": 0.0716161,
+        "description": "amenity type: cafe"
+    },
+    "Food For Thought": {
+        "lat": 51.2670394,
+        "long": 0.0734122,
+        "description": "amenity type: cafe"
+    },
+    "Rendezvous": {
+        "lat": 51.2670659,
+        "long": 0.0703097,
+        "description": "amenity type: restaurant, cuisine: french"
+    },
+    "Napoli \u00e8...": {
+        "lat": 51.2672858,
+        "long": 0.0705832,
+        "description": "amenity type: restaurant, cuisine: italian"
+    },
+    "Fleapit Cinema Club (at Westerham Hall)": {
+        "lat": 51.2687173,
+        "long": 0.073676,
+        "description": "amenity type: cinema"
+    },
+    "Nationwide": {
+        "lat": 51.2672324,
+        "long": 0.07095,
+        "description": "amenity type: bank"
+    },
+    "Barbers of East Street": {
+        "lat": 51.2665917,
+        "long": 0.0696019,
+        "description": "shop type: hairdresser"
+    },
+    "Krasi Meze Bar & Grill": {
+        "lat": 51.2673991,
+        "long": 0.0718355,
+        "description": "amenity type: restaurant, cuisine: mediterranean"
+    },
+    "Day Lewis Pharmacy": {
+        "lat": 51.2669589,
+        "long": 0.0717751,
+        "description": "amenity type: pharmacy"
+    },
+    "Larratt & Co": {
+        "lat": 51.2667241,
+        "long": 0.0699106,
+        "description": "shop type: butcher"
+    },
+    "Manuka": {
+        "lat": 51.2671717,
+        "long": 0.0721571,
+        "description": "shop type: shoes"
+    },
+    "Sultan": {
+        "lat": 51.2669617,
+        "long": 0.070742,
+        "description": "amenity type: fast_food, cuisine: kebab"
+    },
+    "The Comodor": {
+        "lat": 51.2668705,
+        "long": 0.0722311,
+        "description": "amenity type: restaurant"
+    },
+    "Tulsi": {
+        "lat": 51.2677296,
+        "long": 0.0716835,
+        "description": "amenity type: restaurant, cuisine: indian"
+    },
+    "Nisa Local": {
+        "lat": 51.2672285,
+        "long": 0.0710685,
+        "description": "shop type: convenience"
+    },
+    "Westerham Post Office": {
+        "lat": 51.2672205,
+        "long": 0.0709991,
+        "description": "amenity type: post_office"
+    },
+    "Westerham Cyclery": {
+        "lat": 51.2669403,
+        "long": 0.0734048,
+        "description": "amenity type: cafe, shop type: bicycle"
+    },
+    "Churchill's Art Cafe": {
+        "lat": 51.2668464,
+        "long": 0.0733922,
+        "description": "amenity type: cafe, shop type: frame"
+    },
+    "Ashbury Tiles": {
+        "lat": 51.2668019,
+        "long": 0.0725654,
+        "description": "shop type: tiles"
+    },
+    "Chocs on the Green": {
+        "lat": 51.2672302,
+        "long": 0.0725512,
+        "description": "shop type: chocolate"
+    },
+    "Tudor Rose Tea Rooms": {
+        "lat": 51.2672495,
+        "long": 0.0726706,
+        "description": "amenity type: cafe"
+    },
+    "Squerryes Winery": {
+        "lat": 51.2760391,
+        "long": 0.0858964,
+        "description": "amenity type: restaurant"
+    },
+    "The Old Bank": {
+        "lat": 51.267227,
+        "long": 0.0712167,
+        "description": "amenity type: restaurant, cuisine: regional"
+    },
+    "Squerryes Estate Deli and Cellar Door": {
+        "lat": 51.2763338,
+        "long": 0.0862919,
+        "description": "shop type: deli"
+    },
+    "Main car park": {
+        "lat": 51.26807249228256,
+        "long": 0.07725564756797322,
+        "description": "amenity type: parking"
+    },
+    "Churchill Church of England Voluntary Controlled Primary School": {
+        "lat": 51.271923680762164,
+        "long": 0.069271939803122,
+        "description": "amenity type: school"
+    },
+    "Wolfe Westerham": {
+        "lat": 51.27408399765819,
+        "long": 0.07444831034551423,
+        "description": "amenity type: fuel"
+    },
+    "Co-op Food": {
+        "lat": 51.26699952207303,
+        "long": 0.06960055682294261,
+        "description": "shop type: supermarket"
+    },
+    "St Mary the Virgin": {
+        "lat": 51.267528162910125,
+        "long": 0.07366906451746473,
+        "description": "amenity type: place_of_worship"
+    },
+    "Westerham Hall": {
+        "lat": 51.26870077561575,
+        "long": 0.07365626122523256,
+        "description": "amenity type: community_centre"
+    },
+    "Grasshopper On The Green": {
+        "lat": 51.26723496887561,
+        "long": 0.07242455187673467,
+        "description": "amenity type: pub"
+    },
+    "All About U": {
+        "lat": 51.26695147885239,
+        "long": 0.06978072627199981,
+        "description": "shop type: beauty"
+    },
+    "St John the Baptist": {
+        "lat": 51.26571104922041,
+        "long": 0.07750159659489642,
+        "description": "amenity type: place_of_worship"
+    },
+    "General Wolfe": {
+        "lat": 51.26433890042714,
+        "long": 0.06566696372307833,
+        "description": "amenity type: pub"
+    },
+    "Spar": {
+        "lat": 51.274284037117084,
+        "long": 0.07432264595399657,
+        "description": "shop type: convenience"
+    },
+    "Valence School": {
+        "lat": 51.26905888595665,
+        "long": 0.09174644143121788,
+        "description": "amenity type: school"
+    },
+    "Westerham Green": {
+        "lat": 51.266955028849004,
+        "long": 0.07273734637027374,
+        "description": "amenity type: bus_station"
+    },
+    "Vineyard Cafe": {
+        "lat": 51.27619976532428,
+        "long": 0.08623755083422757,
+        "description": "amenity type: cafe"
+    },
+    "House 0": {
+        "lat": 51.270376654246704,
+        "long": 0.07170716862007667,
+        "description": "House"
+    },
+    "House 1": {
+        "lat": 51.26174232163676,
+        "long": 0.07878365323608937,
+        "description": "House"
+    },
+    "House 2": {
+        "lat": 51.26938904819309,
+        "long": 0.07196612648385094,
+        "description": "House"
+    },
+    "House 3": {
+        "lat": 51.26082021387746,
+        "long": 0.08136079272867706,
+        "description": "House"
+    },
+    "House 4": {
+        "lat": 51.254111927779924,
+        "long": 0.09091795732399578,
+        "description": "House"
+    },
+    "House 5": {
+        "lat": 51.264583424905,
+        "long": 0.06889715304899885,
+        "description": "House"
+    },
+    "House 6": {
+        "lat": 51.26641836510043,
+        "long": 0.0722719858101688,
+        "description": "House"
+    },
+    "House 7": {
+        "lat": 51.264292927869946,
+        "long": 0.06627366794663112,
+        "description": "House"
+    },
+    "House 8": {
+        "lat": 51.271027040154905,
+        "long": 0.07879573292334907,
+        "description": "House"
+    },
+    "House 9": {
+        "lat": 51.26255678544825,
+        "long": 0.07697729519761778,
+        "description": "House"
+    },
+    "House 10": {
+        "lat": 51.26588813046798,
+        "long": 0.058547001157316536,
+        "description": "House"
+    },
+    "House 11": {
+        "lat": 51.26903002302214,
+        "long": 0.06408424813855632,
+        "description": "House"
+    },
+    "House 12": {
+        "lat": 51.27445472628848,
+        "long": 0.07885413832168461,
+        "description": "House"
+    },
+    "House 13": {
+        "lat": 51.26837853276187,
+        "long": 0.06378292207274165,
+        "description": "House"
+    },
+    "House 14": {
+        "lat": 51.269727300226926,
+        "long": 0.079623314364653,
+        "description": "House"
+    },
+    "House 15": {
+        "lat": 51.26926025863381,
+        "long": 0.06985209237933315,
+        "description": "House"
+    },
+    "House 16": {
+        "lat": 51.26812690437283,
+        "long": 0.07510511377391543,
+        "description": "House"
+    },
+    "House 17": {
+        "lat": 51.27444361776791,
+        "long": 0.07998112116232528,
+        "description": "House"
+    },
+    "House 18": {
+        "lat": 51.26886128583929,
+        "long": 0.07227624561674767,
+        "description": "House"
+    },
+    "House 19": {
+        "lat": 51.26532203557257,
+        "long": 0.06779082893754854,
+        "description": "House"
+    },
+    "House 20": {
+        "lat": 51.26760044910764,
+        "long": 0.07274448061752077,
+        "description": "House"
+    },
+    "House 21": {
+        "lat": 51.261789374756695,
+        "long": 0.07935204157916094,
+        "description": "House"
+    },
+    "House 22": {
+        "lat": 51.27255909961085,
+        "long": 0.07661321930995128,
+        "description": "House"
+    },
+    "House 23": {
+        "lat": 51.26677387257838,
+        "long": 0.06054462254379425,
+        "description": "House"
+    },
+    "House 24": {
+        "lat": 51.267492342676924,
+        "long": 0.06774976867442001,
+        "description": "House"
+    },
+    "House 25": {
+        "lat": 51.2719495829311,
+        "long": 0.0723493379232627,
+        "description": "House"
+    },
+    "House 26": {
+        "lat": 51.271696491231346,
+        "long": 0.07350144180708057,
+        "description": "House"
+    },
+    "House 27": {
+        "lat": 51.26671318934762,
+        "long": 0.0747760975893012,
+        "description": "House"
+    },
+    "House 28": {
+        "lat": 51.26392548609353,
+        "long": 0.0763910321930523,
+        "description": "House"
+    },
+    "House 29": {
+        "lat": 51.2686426633774,
+        "long": 0.0676812576639183,
+        "description": "House"
+    },
+    "House 30": {
+        "lat": 51.26574361414863,
+        "long": 0.07770153830661439,
+        "description": "House"
+    },
+    "House 31": {
+        "lat": 51.267161618204206,
+        "long": 0.07540933198607067,
+        "description": "House"
+    },
+    "House 32": {
+        "lat": 51.27155827797411,
+        "long": 0.07669294376076546,
+        "description": "House"
+    },
+    "House 33": {
+        "lat": 51.268679837552455,
+        "long": 0.07594998374923204,
+        "description": "House"
+    },
+    "House 34": {
+        "lat": 51.26846450934739,
+        "long": 0.06738152620852123,
+        "description": "House"
+    },
+    "House 35": {
+        "lat": 51.26230068264633,
+        "long": 0.07725737573509811,
+        "description": "House"
+    },
+    "House 36": {
+        "lat": 51.26606531476827,
+        "long": 0.06646979873910736,
+        "description": "House"
+    },
+    "House 37": {
+        "lat": 51.269687580805666,
+        "long": 0.0678985648364218,
+        "description": "House"
+    },
+    "House 38": {
+        "lat": 51.266899237524584,
+        "long": 0.06749393509002115,
+        "description": "House"
+    },
+    "House 39": {
+        "lat": 51.2658511197961,
+        "long": 0.06779964939781845,
+        "description": "House"
+    },
+    "House 40": {
+        "lat": 51.26614951228023,
+        "long": 0.06666193192697231,
+        "description": "House"
+    },
+    "House 41": {
+        "lat": 51.267756184934846,
+        "long": 0.06555060951728327,
+        "description": "House"
+    },
+    "House 42": {
+        "lat": 51.271183571382,
+        "long": 0.07348923416273417,
+        "description": "House"
+    },
+    "House 43": {
+        "lat": 51.26799463763522,
+        "long": 0.07444341923085333,
+        "description": "House"
+    },
+    "House 44": {
+        "lat": 51.263461288168855,
+        "long": 0.0633294136408366,
+        "description": "House"
+    },
+    "House 45": {
+        "lat": 51.271859242006656,
+        "long": 0.07434572311926506,
+        "description": "House"
+    },
+    "House 46": {
+        "lat": 51.27407550228351,
+        "long": 0.08028414112157407,
+        "description": "House"
+    },
+    "House 47": {
+        "lat": 51.26910197132265,
+        "long": 0.07253788019742628,
+        "description": "House"
+    },
+    "House 48": {
+        "lat": 51.270185391105045,
+        "long": 0.07289988913889027,
+        "description": "House"
+    },
+    "House 49": {
+        "lat": 51.27356375821592,
+        "long": 0.07507886872530133,
+        "description": "House"
+    }
+}

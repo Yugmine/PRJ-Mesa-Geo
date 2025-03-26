@@ -38,36 +38,18 @@ class Route:
         """Sets the path offset"""
         self.path_offset = new_offset
 
-class TripMemory:
+@dataclass
+class RoadType:
     """
-    Stores memory of previous trip lengths.
-    Memories can be used to influence planning + mode choice.
+    A type of road.
 
-    memory          Stores memories of previous trips
-                    Uses the form (origin, destination) : {mode: travel_time}
+    highway         The road class e.g. "primary"
+    maxspeed        The speed limit e.g. "40 mph"
+    info            Any relevant natural language information about the road
     """
-    memory: dict[tuple[str, str], dict[str, float]]
+    highway: str
+    maxspeed: str
+    info: str = "n/a"
 
-    def __init__(self) -> None:
-        self.memory = {}
-
-    def add_trip(
-            self,
-            trip: Trip,
-            mode: str,
-            end_time: Time
-        ) -> None:
-        """Adds a trip to the memory"""
-        # Currently, only stores the latest trip and stores in both directions
-        # TODO: store an average over all trips?
-        path = (trip.origin, trip.destination)
-        if path not in self.memory:
-            self.memory[path] = {}
-        trip_time = trip.start_time.time_to(end_time)
-        self.memory[path][mode] = trip_time
-
-    def get_trip_times(self, trip: Trip) -> dict[str, float]:
-        """Gets the remembered travel times for the given trip"""
-        if (trip.origin, trip.destination) not in self.memory:
-            return {}
-        return self.memory[(trip.origin, trip.destination)]
+    def __hash__(self):
+        return hash((self.highway, self.maxspeed, self.info))

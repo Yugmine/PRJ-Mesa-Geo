@@ -2,13 +2,13 @@
 import random
 import mesa
 import mesa_geo as mg
-from shapely import Point, Polygon
+from shapely import Point, Polygon, LineString
 
 class NetworkLink(mg.GeoAgent):
     """A transport link between two points (e.g. a road)"""
     unique_id: int
     model: mesa.Model
-    geometry: Point
+    geometry: LineString
 
 class Road(NetworkLink):
     """A road for cars"""

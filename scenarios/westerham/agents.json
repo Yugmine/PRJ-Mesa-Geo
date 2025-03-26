@@ -1,0 +1,92 @@
+[
+    {
+        "name": "Alice Bennett",
+        "home": "House 0",
+        "description": "Alice works at 'Costa' from 08:30 to 17:00. She enjoys her daily routine and often grabs a coffee before starting her shift.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.7,
+        "bike_speed": 14.5
+    },
+    {
+        "name": "James Carter",
+        "home": "House 1",
+        "description": "James is a barista at 'The George and Dragon'. His work hours are from 07:00 to 15:00, and he enjoys chatting with regulars.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.2,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Sophie Davis",
+        "home": "House 2",
+        "description": "Sophie works at 'Deli Di Luca' from 10:00 to 18:00. She loves preparing fresh sandwiches and meeting new customers.",
+        "owns_car": false,
+        "owns_bike": true,
+        "walk_speed": 4.8,
+        "bike_speed": 16.0
+    },
+    {
+        "name": "Daniel Evans",
+        "home": "House 3",
+        "description": "Daniel is a cashier at 'Co-op Food', working from 09:00 to 17:00. He enjoys helping customers find what they need.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.3,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Olivia Foster",
+        "home": "House 32",
+        "description": "Olivia is a pharmacist at 'Day Lewis Pharmacy', working from 08:00 to 16:30. She ensures everyone gets the right medication.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.6,
+        "bike_speed": 14.0
+    },
+    {
+        "name": "William Green",
+        "home": "House 5",
+        "description": "William is a teacher at 'Churchill Church of England Voluntary Controlled Primary School', working from 07:30 to 15:30.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.5,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Emily Harris",
+        "home": "House 6",
+        "description": "Emily works at 'Squerryes Winery' from 11:00 to 19:00. She enjoys giving wine tours and tastings to visitors.",
+        "owns_car": false,
+        "owns_bike": true,
+        "walk_speed": 4.4,
+        "bike_speed": 15.5
+    },
+    {
+        "name": "Henry Irving",
+        "home": "House 7",
+        "description": "Henry is a banker at 'Nationwide', working from 09:00 to 17:00. He helps customers manage their finances.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.3,
+        "bike_speed": 13.5
+    },
+    {
+        "name": "Charlotte Jones",
+        "home": "House 8",
+        "description": "Charlotte is a chef at 'Napoli è...' and works from 14:00 to 22:00. She specializes in making authentic Italian dishes.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.2,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Benjamin King",
+        "home": "House 9",
+        "description": "Benjamin is a barber at 'Barbers of East Street', working from 10:00 to 18:00. He enjoys styling hair and chatting with clients.",
+        "owns_car": false,
+        "owns_bike": true,
+        "walk_speed": 4.7,
+        "bike_speed": 15.0
+    }
+]
