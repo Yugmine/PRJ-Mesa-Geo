@@ -1,5 +1,6 @@
 """Handles calls to the large language model"""
 import os
+import sqlite3
 from openai import OpenAI
 
 client = OpenAI(
@@ -7,8 +8,17 @@ client = OpenAI(
     api_key = 'foo'
 )
 
-def generate_response(system_prompt: str, content: str) -> str:
-    """Generates a response for the given prompt"""
+def query_cache(cur: sqlite3.Cursor, system_prompt: str, content: str) -> str | None:
+    """Queries the cache for a response to the given prompt"""
+    params = (system_prompt, content)
+    res = cur.execute("SELECT * FROM cache WHERE system_prompt=? AND content=?", params)
+    entry = res.fetchone()
+    if entry is not None:
+        return entry[2]
+    return None
+
+def query_llm(system_prompt: str, content: str) -> str:
+    """Gets a response from the LLM for the given prompt"""
     chat_completion = client.chat.completions.create(
         messages=[
             {
@@ -25,6 +35,19 @@ def generate_response(system_prompt: str, content: str) -> str:
         temperature=0.7
     )
     return chat_completion.choices[0].message.content
+
+def generate_response(system_prompt: str, content: str) -> str:
+    """Generates a response for the given prompt"""
+    con = sqlite3.connect("./llm/cache.db")
+    cur = con.cursor()
+    response = query_cache(cur, system_prompt, content)
+    if response is None:
+        response = query_llm(system_prompt, content)
+        data = (system_prompt, content, response)
+        cur.execute("INSERT INTO cache VALUES (?, ?, ?)", data)
+        con.commit()
+    con.close()
+    return response
 
 def generate_prompt(inputs: list, prompt_file: str) -> str:
     """

@@ -1,6 +1,6 @@
 """Classes to help with trips and routes"""
 from dataclasses import dataclass
-from utils.model_time import Time
+from transport_model.time import Time
 
 @dataclass
 class Trip:

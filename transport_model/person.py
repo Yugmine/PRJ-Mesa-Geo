@@ -3,8 +3,8 @@ import re
 import mesa
 import mesa_geo as mg
 from shapely import Point
-from utils.llm import generate_response, generate_prompt
-from utils.model_time import Time
+from llm.llm import generate_response, generate_prompt
+from transport_model.time import Time
 from .routes import Trip, Route, RoadType
 from .memory import TravelMemory, MemoryEntry, ModeChoice
 

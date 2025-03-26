@@ -2,7 +2,7 @@
 import solara
 from transport_model.model import TransportModel
 from transport_model.person import PersonAgent
-from utils.model_time import Time
+from transport_model.time import Time
 
 def agent_mode_view(agent: PersonAgent) -> solara.Text:
     """Displays information about the provided agent's travel mode"""

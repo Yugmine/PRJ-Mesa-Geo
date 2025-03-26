@@ -8,7 +8,7 @@ import geopandas
 import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
-from utils.model_time import Time
+from transport_model.time import Time
 from .geo_agents import NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from .person import Person, PersonAgent
 from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork

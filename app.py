@@ -5,8 +5,8 @@ from transport_model.model import TransportModel
 from transport_model.geo_agents import Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from transport_model.person import PersonAgent
 from utils.viz_components import info_panel
-from utils.custom_geospace_component import make_geospace_component
-from utils.custom_solara_viz import SolaraViz
+from modified_lib_files.custom_geospace_component import make_geospace_component
+from modified_lib_files.custom_solara_viz import SolaraViz
 
 def draw(agent: Agent) -> dict:
     """Defines how a given agent should be represented"""

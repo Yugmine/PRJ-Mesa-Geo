@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 SCENARIO = "westerham"
-RUN = 0
+RUN = 1
 
 data_path = os.path.join("./output", SCENARIO, f"run {RUN}.csv")
 

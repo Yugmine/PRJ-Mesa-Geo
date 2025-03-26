@@ -1,7 +1,7 @@
 """Memory used to store the agents' past experiences with travel"""
 from dataclasses import dataclass
 from typing import override
-from utils.model_time import Time
+from transport_model.time import Time
 from .routes import RoadType
 
 @dataclass
