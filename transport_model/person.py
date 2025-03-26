@@ -3,7 +3,7 @@ import re
 import mesa
 import mesa_geo as mg
 from shapely import Point
-from llm.llm import generate_response, generate_prompt
+from llm.llm import generate_response, generate_prompt, drop_cache
 from transport_model.time import Time
 from .routes import Trip, Route, RoadType
 from .memory import TravelMemory, MemoryEntry, ModeChoice
@@ -411,6 +411,8 @@ class PersonAgent(mg.GeoAgent):
             action_location = generate_response(system_prompt, prompt)
             if self.model.is_location(action_location):
                 return action_location
+            # Drop the invalid entry from the cache so we can generate a new one
+            drop_cache(system_prompt, prompt)
 
         # Timeout - failed to generate valid location within 3 attempts
         print(f"WARNING: agent {self.person.name} couldn't get valid location for action: {action}")

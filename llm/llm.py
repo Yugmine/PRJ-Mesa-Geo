@@ -49,6 +49,18 @@ def generate_response(system_prompt: str, content: str) -> str:
     con.close()
     return response
 
+def drop_cache(system_prompt: str, content: str) -> None:
+    """
+    Drops the given entry from the cache,
+    so that it can be re-generated on the next call.
+    """
+    con = sqlite3.connect("./llm/cache.db")
+    cur = con.cursor()
+    params = (system_prompt, content)
+    cur.execute("DELETE FROM cache WHERE system_prompt=? AND content=?", params)
+    con.commit()
+    con.close()
+
 def generate_prompt(inputs: list, prompt_file: str) -> str:
     """
     Fills in the chosen prompt template with the provided inputs.

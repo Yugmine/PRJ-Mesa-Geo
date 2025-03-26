@@ -179,6 +179,15 @@ class TransportModel(mesa.Model):
             files = []
         return len(files)
 
+    def _write_journeys_to_csv(self) -> None:
+        """Writes data from the journeys table to disk"""
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
+        dataframe = self.datacollector.get_table_dataframe("journeys")
+        num_files = self._get_num_files(self.output_path)
+        csv_path = os.path.join(self.output_path, f"run {num_files}.csv")
+        dataframe.to_csv(csv_path)
+
     def get_location_coords(self, loc_name: str) -> tuple[float, float]:
         """Returns the coordinates of the specified location"""
         long = self.locations[loc_name]["long"]
@@ -201,14 +210,11 @@ class TransportModel(mesa.Model):
 
     def step(self) -> None:
         if self.time.time_to(Time(4, 0)) < self.time_step:
+            print(f"PROGRESS - it's 04:00 on day {self.day}")
             if self.day == self.n_days + 1:
                 # simulation has finished - record journey data
-                if not os.path.exists(self.output_path):
-                    os.makedirs(self.output_path)
-                dataframe = self.datacollector.get_table_dataframe("journeys")
-                num_files = self._get_num_files(self.output_path)
-                csv_path = os.path.join(self.output_path, f"run {num_files}.csv")
-                dataframe.to_csv(csv_path)
+                self._write_journeys_to_csv()
+                self.running = False
 
         self.agents_by_type[PersonAgent].shuffle_do("step")
         self.datacollector.collect(self)
