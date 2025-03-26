@@ -332,6 +332,31 @@ class PersonAgent(mg.GeoAgent):
             length = edge_info["length"]
             self.memory_entry.add_comfort(comfort, length)
 
+    def _record_journey(self, trip_time: float) -> None:
+        """Records the journey that just finished in the model datacollector"""
+        start_time = self.trip.start_time
+        end_time = start_time.n_mins_from_now(trip_time)
+        end_day = self.model.day
+        if end_time.hour >= start_time.hour:
+            start_day = end_day
+        else:
+            # We've wrapped over to a new day
+            start_day = end_day - 1
+        row = {
+            "agent_name": self.person.name,
+            "origin": self.trip.origin,
+            "destination": self.trip.destination,
+            "start_day": start_day,
+            "start_hour": start_time.hour,
+            "start_minute": start_time.minute,
+            "end_day": end_day,
+            "end_hour": end_time.hour,
+            "end_minute": end_time.minute,
+            "travel_time": trip_time,
+            "mode": self.route.mode
+        }
+        self.model.datacollector.add_table_row("journeys", row)
+
     def _follow_route(self) -> None:
         """Move along the planned route"""
         network = self.model.get_network(self.route.mode)
@@ -353,6 +378,7 @@ class PersonAgent(mg.GeoAgent):
             self.location = self.trip.destination
             trip_time = self._calculate_trip_time(mins_left)
             self.memory_entry.complete_memory(trip_time)
+            self._record_journey(trip_time)
             self._clear_travel_info()
             self._next_plan_step()
 

@@ -25,6 +25,7 @@ class TransportModel(mesa.Model):
     """The core model class"""
     CRS = "EPSG:4326"
     scenario_path: str
+    output_path: str
     space: mg.GeoSpace
     locations: dict
     drive_network: DriveNetwork
@@ -37,6 +38,7 @@ class TransportModel(mesa.Model):
     time_step: int
     default_speed_limit: int
     car_speed_factor: float
+    n_days: int
     datacollector: mesa.DataCollector
 
     def __init__(
@@ -44,7 +46,8 @@ class TransportModel(mesa.Model):
         scenario: str,
         time_step: int = 5,
         default_speed_limit: int = 30,
-        car_speed_factor: float = 0.75
+        car_speed_factor: float = 0.75,
+        n_days = 5,
     ) -> None:
         """
         Constructor for the model
@@ -55,15 +58,18 @@ class TransportModel(mesa.Model):
         default_speed_limit     The speed limit (in km/h) applied to roads
                                 with no defined speed limit.
         car_speed_factor        Multiplied by speed limit to get the speed a car will travel at.
+        n_days                  The number of days to run the simulation for.
         """
         super().__init__()
 
         self.scenario_path = os.path.join("./scenarios", scenario)
+        self.output_path = os.path.join("./output", scenario)
         self.day = 1
         self.time = Time(4, 0)
         self.time_step = time_step
         self.default_speed_limit = default_speed_limit
         self.car_speed_factor = car_speed_factor
+        self.n_days = n_days
 
         self.space = mg.GeoSpace(crs=self.CRS, warn_crs_conversion=False)
 
@@ -88,6 +94,21 @@ class TransportModel(mesa.Model):
                 "num_driving": partial(get_num_agents_by_mode, mode="drive"),
                 "num_walking": partial(get_num_agents_by_mode, mode="walk"),
                 "num_cycling": partial(get_num_agents_by_mode, mode="bike"),
+            },
+            tables={
+                "journeys": [
+                    "agent_name",
+                    "origin",
+                    "destination",
+                    "start_day",
+                    "start_hour",
+                    "start_minute",
+                    "end_day",
+                    "end_hour",
+                    "end_minute",
+                    "travel_time",
+                    "mode"
+                ]
             }
         )
 
@@ -150,6 +171,14 @@ class TransportModel(mesa.Model):
         if new_day:
             self.day += 1
 
+    def _get_num_files(self, path: str) -> int:
+        """Gets the number of files in the provided directory"""
+        try:
+            files = next(os.walk(path))[2]
+        except StopIteration:
+            files = []
+        return len(files)
+
     def get_location_coords(self, loc_name: str) -> tuple[float, float]:
         """Returns the coordinates of the specified location"""
         long = self.locations[loc_name]["long"]
@@ -171,6 +200,16 @@ class TransportModel(mesa.Model):
         return None
 
     def step(self) -> None:
+        if self.time.time_to(Time(4, 0)) < self.time_step:
+            if self.day == self.n_days + 1:
+                # simulation has finished - record journey data
+                if not os.path.exists(self.output_path):
+                    os.makedirs(self.output_path)
+                dataframe = self.datacollector.get_table_dataframe("journeys")
+                num_files = self._get_num_files(self.output_path)
+                csv_path = os.path.join(self.output_path, f"run {num_files}.csv")
+                dataframe.to_csv(csv_path)
+
         self.agents_by_type[PersonAgent].shuffle_do("step")
         self.datacollector.collect(self)
         self._update_clock()

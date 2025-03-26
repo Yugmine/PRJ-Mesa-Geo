@@ -20,7 +20,7 @@ class Time:
         return self.hour == other.hour and self.minute == other.minute
 
     def __repr__(self):
-        return f"{self.hour:02d}:{self.minute:02d}"
+        return f"{self.hour:02d}:{int(self.minute):02d}"
 
     def _increment(self, extra_mins: float) -> tuple[int, float]:
         """

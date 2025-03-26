@@ -1,0 +1,55 @@
+,agent_name,origin,destination,start_day,start_hour,start_minute,end_day,end_hour,end_minute,travel_time,mode
+0,James Carter,House 1,The George and Dragon,1,7,0,1,7,14.397300505531673,14.397300505531673,walk
+1,Alice Bennett,House 0,Costa,1,7,15,1,7,17.52686557528632,2.526865575286319,bike
+2,William Green,House 5,Churchill Church of England Voluntary Controlled Primary School,1,7,30,1,7,32.32809564138691,2.328095641386909,drive
+3,Alice Bennett,Costa,House 0,1,8,0,1,8,2.5268655752863207,2.5268655752863207,bike
+4,Olivia Foster,House 32,Day Lewis Pharmacy,1,8,0,1,8,3.147003828829685,3.147003828829685,bike
+5,Alice Bennett,House 0,Costa,1,8,30,1,8,37.47252333436441,7.472523334364411,walk
+6,Henry Irving,House 7,Nationwide,1,9,0,1,9,2.2654131727425777,2.2654131727425777,bike
+7,Daniel Evans,House 3,Co-op Food,1,9,15,1,9,18.499473253684883,3.499473253684883,drive
+8,Sophie Davis,House 2,Deli Di Luca,1,10,0,1,10,3.0942124426205395,3.0942124426205395,walk
+9,Olivia Foster,Day Lewis Pharmacy,Costa,1,10,15,1,10,15.034792801546361,0.03479280154636122,drive
+10,Olivia Foster,Costa,Day Lewis Pharmacy,1,11,0,1,11,0.14756247260033195,0.14756247260033195,walk
+11,Emily Harris,House 6,Squerryes Winery,1,11,0,1,11,7.295360933051993,7.295360933051993,bike
+12,Benjamin King,House 9,Barbers of East Street,1,11,30,1,11,34.603330989656634,4.603330989656634,bike
+13,William Green,Churchill Church of England Voluntary Controlled Primary School,Costa,1,12,0,1,12,1.903807870256264,1.903807870256264,drive
+14,Sophie Davis,Deli Di Luca,Westerham Green,1,12,0,1,12,1.1013467870905047,1.1013467870905047,walk
+15,Daniel Evans,Co-op Food,Costa,1,12,0,1,12,2.689978207894881,2.689978207894881,walk
+16,Olivia Foster,Day Lewis Pharmacy,Costa,1,12,30,1,12,30.059993128298387,0.05999312829838743,bike
+17,Benjamin King,Barbers of East Street,Costa,1,12,45,1,12,45.76218456517953,0.7621845651795311,bike
+18,Daniel Evans,Costa,Co-op Food,1,13,0,1,13,2.689978207894881,2.689978207894881,walk
+19,William Green,Costa,Churchill Church of England Voluntary Controlled Primary School,1,13,0,1,13,1.903807870256264,1.903807870256264,drive
+20,Benjamin King,Costa,Barbers of East Street,1,13,15,1,13,15.76218456517953,0.7621845651795294,bike
+21,Olivia Foster,Costa,Day Lewis Pharmacy,1,13,30,1,13,30.059993128298387,0.05999312829838743,bike
+22,Sophie Davis,Westerham Green,Deli Di Luca,1,14,0,1,14,1.1013467870905047,1.1013467870905047,walk
+23,James Carter,The George and Dragon,House 1,1,15,0,1,15,2.9823564571347325,2.9823564571347325,drive
+24,Charlotte Jones,House 8,Napoli è...,1,15,0,1,15,2.159007310923676,2.159007310923676,drive
+25,Henry Irving,Nationwide,Costa,1,15,0,1,15,1.6533857626976962,1.6533857626976962,walk
+26,Henry Irving,Costa,Nationwide,1,16,0,1,16,0.3634077098670634,0.3634077098670634,drive
+27,Benjamin King,Barbers of East Street,House 9,1,16,0,1,16,4.603330989656635,4.603330989656635,bike
+28,William Green,Churchill Church of England Voluntary Controlled Primary School,House 5,1,16,0,1,16,2.328095641386912,2.328095641386912,drive
+29,Olivia Foster,Day Lewis Pharmacy,House 32,1,16,30,1,16,31.89041032192007,1.8904103219200685,drive
+30,James Carter,House 1,The George and Dragon,1,17,0,1,17,2.982356457134733,2.982356457134733,drive
+31,William Green,House 5,Rendezvous,1,17,0,1,17,5.341179697809847,5.341179697809847,walk
+32,Alice Bennett,Costa,House 0,1,17,0,1,17,7.47252333436441,7.47252333436441,walk
+33,Daniel Evans,Co-op Food,House 3,1,17,0,1,17,19.12385950438108,19.12385950438108,walk
+34,Olivia Foster,House 32,Day Lewis Pharmacy,1,17,30,1,17,31.89041032192007,1.8904103219200685,drive
+35,Henry Irving,Nationwide,House 7,1,18,0,1,18,2.2654131727425777,2.2654131727425777,bike
+36,Sophie Davis,Deli Di Luca,House 2,1,18,0,1,18,0.9282637327861618,0.9282637327861618,bike
+37,Alice Bennett,House 0,Costa,1,19,0,1,19,2.5268655752863203,2.5268655752863203,bike
+38,Olivia Foster,Day Lewis Pharmacy,Vineyard Cafe,1,19,0,1,19,3.0393947957484575,3.0393947957484575,drive
+39,Olivia Foster,Vineyard Cafe,Day Lewis Pharmacy,1,20,0,1,20,3.087996930735643,3.087996930735643,drive
+40,Alice Bennett,Costa,The George and Dragon,1,20,0,1,20,0.03479280154636122,0.03479280154636122,drive
+41,Benjamin King,House 9,The George and Dragon,1,20,0,1,20,12.767705396602661,12.767705396602661,walk
+42,James Carter,The George and Dragon,Fleapit Cinema Club (at Westerham Hall),1,20,30,1,20,34.7973161019013,4.797316101901302,walk
+43,Daniel Evans,House 3,Westerham Green,1,21,30,1,21,32.792428540354116,2.7924285403541163,drive
+44,William Green,Rendezvous,House 5,1,22,0,1,22,1.091972875949982,1.091972875949982,drive
+45,Henry Irving,House 7,Nationwide,1,22,0,1,22,1.267204479690447,1.267204479690447,drive
+46,James Carter,Fleapit Cinema Club (at Westerham Hall),House 1,1,22,0,1,22,3.8619025562480482,3.8619025562480482,drive
+47,Olivia Foster,Day Lewis Pharmacy,Costa,1,22,0,1,22,0.03479280154636122,0.03479280154636122,drive
+48,Alice Bennett,The George and Dragon,House 0,1,22,0,1,22,7.946970690675059,7.946970690675059,walk
+49,Daniel Evans,Westerham Green,House 3,1,22,0,1,22,15.723052923608442,15.723052923608442,walk
+50,Emily Harris,Squerryes Winery,House 6,1,22,30,1,22,37.295360933051995,7.295360933051995,bike
+51,Olivia Foster,Costa,Day Lewis Pharmacy,1,23,0,1,23,0.14756247260033195,0.14756247260033195,walk
+52,Charlotte Jones,Napoli è...,Costa,1,23,0,1,23,0.23664293923568014,0.23664293923568014,drive
+53,Alice Bennett,House 0,Costa,1,23,59,2,0,1.5268655752863225,2.5268655752863207,bike
