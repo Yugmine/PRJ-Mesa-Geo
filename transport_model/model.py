@@ -2,13 +2,14 @@
 import json
 import os
 from functools import partial
+from time import localtime, strftime
 import mesa
 import mesa_geo as mg
 import geopandas
 import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
-from transport_model.time import Time
+from .time import Time
 from .geo_agents import NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
 from .person import Person, PersonAgent
 from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
@@ -39,6 +40,8 @@ class TransportModel(mesa.Model):
     default_speed_limit: int
     car_speed_factor: float
     n_days: int
+    driving_extra_time: float
+    cycling_extra_time: float
     datacollector: mesa.DataCollector
 
     def __init__(
@@ -48,6 +51,8 @@ class TransportModel(mesa.Model):
         default_speed_limit: int = 30,
         car_speed_factor: float = 0.75,
         n_days = 5,
+        driving_extra_time = 3,
+        cycling_extra_time = 2
     ) -> None:
         """
         Constructor for the model
@@ -59,6 +64,10 @@ class TransportModel(mesa.Model):
                                 with no defined speed limit.
         car_speed_factor        Multiplied by speed limit to get the speed a car will travel at.
         n_days                  The number of days to run the simulation for.
+        driving_extra_time      Extra time (in minutes) added to driving journeys to account for
+                                starting & parking the car.
+        cycling_extra_time      Extra time (in minutes) added to cycling journeys to account for
+                                getting out & storing the bike.
         """
         super().__init__()
 
@@ -70,6 +79,8 @@ class TransportModel(mesa.Model):
         self.default_speed_limit = default_speed_limit
         self.car_speed_factor = car_speed_factor
         self.n_days = n_days
+        self.driving_extra_time = driving_extra_time
+        self.cycling_extra_time = cycling_extra_time
 
         self.space = mg.GeoSpace(crs=self.CRS, warn_crs_conversion=False)
 
@@ -208,9 +219,18 @@ class TransportModel(mesa.Model):
             return self.bike_network
         return None
 
+    def get_extra_time(self, mode: str) -> float:
+        """Gets extra time for the provided mode"""
+        if mode == "drive":
+            return self.driving_extra_time
+        if mode == "bike":
+            return self.cycling_extra_time
+        return 0
+
     def step(self) -> None:
+        print(f"Model time - {self.time}", end="\r")
         if self.time.time_to(Time(4, 0)) < self.time_step:
-            print(f"PROGRESS - it's 04:00 on day {self.day}")
+            print(f"{strftime('%H:%M:%S', localtime())} - it's 04:00 on day {self.day}")
             if self.day == self.n_days + 1:
                 # simulation has finished - record journey data
                 self._write_journeys_to_csv()

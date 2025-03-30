@@ -172,6 +172,7 @@ class PersonAgent(mg.GeoAgent):
         if route_memory is None:
             network = self.model.get_network(route.mode)
             est_travel_time = network.get_path_duration(route.path, self._get_speed(route.mode))
+            est_travel_time += self.model.get_extra_time(route.mode)
             return (
                 f"mode: {route.mode}, "
                 f"not previously used, "
@@ -266,7 +267,8 @@ class PersonAgent(mg.GeoAgent):
                             (after the trip finished).
         """
         end_time = self.model.time.n_mins_from_now(self.model.time_step - mins_left)
-        return self.trip.start_time.time_to(end_time)
+        extra_time = self.model.get_extra_time(self.route.mode)
+        return self.trip.start_time.time_to(end_time) + extra_time
 
     def _handle_list_attrs(self, attr: str | list) -> str:
         """

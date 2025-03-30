@@ -4,10 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 SCENARIO = "westerham"
-RUN = 4
-
-#print(df["mode"].value_counts())
-#print(df.groupby(["start_day"]).value_counts())
+RUN = 6
 
 def graph_daily_share(trips: pd.DataFrame):
     """Graphs the percentage share of each mode per day"""

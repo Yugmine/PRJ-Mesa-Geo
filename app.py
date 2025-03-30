@@ -45,6 +45,8 @@ model_params = {
     "default_speed_limit": 30,
     "car_speed_factor": 0.75,
     "n_days": 1,
+    "driving_extra_time": 3,
+    "cycling_extra_time": 2
 }
 
 transport_model = TransportModel(
@@ -52,7 +54,9 @@ transport_model = TransportModel(
     model_params["time_step"]["value"],
     model_params["default_speed_limit"],
     model_params["car_speed_factor"],
-    model_params["n_days"]
+    model_params["n_days"],
+    model_params["driving_extra_time"],
+    model_params["cycling_extra_time"]
 )
 
 page = SolaraViz(
