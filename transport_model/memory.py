@@ -101,7 +101,7 @@ class TravelMemory:
     justifications      Stores justifications for mode choices.
     """
     route_memory: dict[tuple[str, tuple[int, ...]], MemoryEntry]
-    comfort_memory: dict[RoadType, dict[str, int]]
+    comfort_memory: dict[RoadType, int]
     justifications: list[ModeChoice]
 
     def __init__(self) -> None:

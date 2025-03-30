@@ -6,7 +6,7 @@ model = TransportModel(
     time_step = 5,
     default_speed_limit = 30,
     car_speed_factor = 0.75,
-    n_days = 5
+    n_days = 20
 )
 
 if __name__ == "__main__":
