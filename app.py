@@ -18,7 +18,10 @@ def draw(agent: Agent) -> dict:
         else:
             portrayal["color"] = "red"
     elif isinstance(agent, Road):
-        portrayal["color"] = "grey"
+        if hasattr(agent, "extra_info") and isinstance(agent.extra_info, str):
+            portrayal["color"] = "yellow"
+        else:
+            portrayal["color"] = "grey"
     elif isinstance(agent, Area):
         portrayal["stroke"] = False
         if isinstance(agent, ResidentialArea):
@@ -44,9 +47,9 @@ model_params = {
     },
     "default_speed_limit": 30,
     "car_speed_factor": 0.75,
-    "n_days": 1,
-    "driving_extra_time": 3,
-    "cycling_extra_time": 2
+    "n_days": 10,
+    "driving_extra_time": 5,
+    "cycling_extra_time": 5
 }
 
 transport_model = TransportModel(

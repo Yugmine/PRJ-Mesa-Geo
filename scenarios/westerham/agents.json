@@ -4,7 +4,7 @@
         "home": "House 0",
         "description": "Alice works at 'Costa' from 08:30 to 17:00. She enjoys her daily routine and often grabs a coffee before starting her shift.",
         "owns_car": true,
-        "owns_bike": true,
+        "owns_bike": false,
         "walk_speed": 4.7,
         "bike_speed": 14.5
     },
@@ -21,8 +21,8 @@
         "name": "Sophie Davis",
         "home": "House 2",
         "description": "Sophie works at 'Deli Di Luca' from 10:00 to 18:00. She loves preparing fresh sandwiches and meeting new customers.",
-        "owns_car": false,
-        "owns_bike": true,
+        "owns_car": true,
+        "owns_bike": false,
         "walk_speed": 4.8,
         "bike_speed": 16.0
     },
@@ -57,7 +57,7 @@
         "name": "Emily Harris",
         "home": "House 6",
         "description": "Emily works at 'Squerryes Winery' from 11:00 to 19:00. She enjoys giving wine tours and tastings to visitors.",
-        "owns_car": false,
+        "owns_car": true,
         "owns_bike": true,
         "walk_speed": 4.4,
         "bike_speed": 15.5
@@ -88,5 +88,204 @@
         "owns_bike": true,
         "walk_speed": 4.7,
         "bike_speed": 15.0
+    },
+    {
+        "name": "Grace Lewis",
+        "home": "House 10",
+        "description": "Grace works at 'Manuka' from 09:30 to 17:30. She loves selling organic food and skincare products to the community.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.5,
+        "bike_speed": 14.2
+    },
+    {
+        "name": "Michael Moore",
+        "home": "House 11",
+        "description": "Michael is a mechanic at 'General Wolfe' and works from 08:00 to 16:00. He specializes in car repairs and maintenance.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.2,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Ethan Mitchell",
+        "home": "House 12",
+        "description": "Ethan works at 'Rendezvous' from 12:00 to 20:00. He enjoys crafting unique cocktails for customers.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.3,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Isabella Nelson",
+        "home": "House 13",
+        "description": "Isabella is a cashier at 'Spar', working from 07:00 to 15:00. She enjoys chatting with the morning customers.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.5,
+        "bike_speed": 15.2
+    },
+    {
+        "name": "Lucas Parker",
+        "home": "House 14",
+        "description": "Lucas is a delivery driver for 'Squerryes Estate Deli and Cellar Door', working from 08:00 to 16:00.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.4,
+        "bike_speed": 14.8
+    },
+    {
+        "name": "Mia Robinson",
+        "home": "House 15",
+        "description": "Mia is a florist at 'Larratt & Co', working from 09:00 to 17:30. She loves arranging flowers for customers.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.6,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Jack Stewart",
+        "home": "House 16",
+        "description": "Jack is a bike mechanic at 'Westerham Cyclery' and works from 10:00 to 18:00.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.2,
+        "bike_speed": 15.5
+    },
+    {
+        "name": "Sophia Turner",
+        "home": "House 17",
+        "description": "Sophia is a librarian at 'Westerham Hall' and works from 09:00 to 17:00. She enjoys organizing reading events.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.3,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Matthew Scott",
+        "home": "House 18",
+        "description": "Matthew is a chef at 'The Old Bank', working from 15:00 to 23:00. He specializes in steak dishes.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.5,
+        "bike_speed": 14.7
+    },
+    {
+        "name": "Ava Wright",
+        "home": "House 19",
+        "description": "Ava is a yoga instructor at 'All About U', working from 07:30 to 14:30. She enjoys promoting healthy living.",
+        "owns_car": false,
+        "owns_bike": true,
+        "walk_speed": 4.8,
+        "bike_speed": 16.0
+    },
+    {
+        "name": "Daniel Adams",
+        "home": "House 20",
+        "description": "Daniel is a security guard at 'Main car park', working from 18:00 to 02:00. He ensures safety around the area.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.2,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Chloe Baker",
+        "home": "House 21",
+        "description": "Chloe is a chocolatier at 'Chocs on the Green', working from 10:00 to 18:00. She loves making artisanal chocolates.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.5,
+        "bike_speed": 15.0
+    },
+    {
+        "name": "Ryan Cooper",
+        "home": "House 22",
+        "description": "Ryan is a butcher at 'Food For Thought', working from 06:00 to 14:00. He enjoys preparing fresh cuts of meat for customers.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.4,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Emma Brooks",
+        "home": "House 23",
+        "description": "Emma is a baker at 'Tudor Rose Tea Rooms', working from 05:00 to 13:00. She specializes in pastries and fresh bread.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.6,
+        "bike_speed": 14.8
+    },
+    {
+        "name": "Joshua Reed",
+        "home": "House 24",
+        "description": "Joshua is a postal worker at 'Westerham Post Office', working from 07:00 to 15:00. He ensures mail is delivered efficiently.",
+        "owns_car": false,
+        "owns_bike": false,
+        "walk_speed": 4.5,
+        "bike_speed": 15.5
+    },
+    {
+        "name": "Hannah Ward",
+        "home": "House 25",
+        "description": "Hannah is a barista at 'Vineyard Cafe', working from 08:30 to 16:30. She loves making specialty coffee for customers.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.3,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Nathan Morgan",
+        "home": "House 26",
+        "description": "Nathan is a historian at 'St Mary the Virgin', working from 09:00 to 17:00. He enjoys sharing historical knowledge with visitors.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.4,
+        "bike_speed": 14.5
+    },
+    {
+        "name": "Zoe Phillips",
+        "home": "House 27",
+        "description": "Zoe is a tour guide at 'Squerryes Winery', working from 10:00 to 18:00. She enjoys leading wine tastings and vineyard tours.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.7,
+        "bike_speed": 15.2
+    },
+    {
+        "name": "Elliot Hughes",
+        "home": "House 28",
+        "description": "Elliot is an accountant at 'The Old Bank', working from 09:00 to 17:30. He helps clients manage their finances.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.2,
+        "bike_speed": 0.0
+    },
+    {
+        "name": "Lily Shaw",
+        "home": "House 29",
+        "description": "Lily is a server at 'Sultan', working from 16:00 to 00:00. She enjoys ensuring customers have a great dining experience.",
+        "owns_car": true,
+        "owns_bike": true,
+        "walk_speed": 4.5,
+        "bike_speed": 14.0
+    },
+    {
+        "name": "Oscar Bennett",
+        "home": "House 30",
+        "description": "Oscar is a gym trainer at 'All About U', working from 06:30 to 14:30. He enjoys helping people achieve their fitness goals.",
+        "owns_car": false,
+        "owns_bike": true,
+        "walk_speed": 4.8,
+        "bike_speed": 16.2
+    },
+    {
+        "name": "Lucy Patterson",
+        "home": "House 31",
+        "description": "Lucy is a cashier at 'Nisa Local', working from 10:00 to 18:00. She enjoys assisting customers with their daily shopping.",
+        "owns_car": true,
+        "owns_bike": false,
+        "walk_speed": 4.3,
+        "bike_speed": 0.0
     }
 ]
+

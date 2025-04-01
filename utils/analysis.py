@@ -1,10 +1,10 @@
-"""Analysis of model outputs"""
+"""Analysis of recorded trip data"""
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
 SCENARIO = "westerham"
-RUN = 6
+RUN = 14
 
 def graph_daily_share(trips: pd.DataFrame):
     """Graphs the percentage share of each mode per day"""
@@ -28,8 +28,21 @@ def final_n_days_share(trips: pd.DataFrame, n: int):
     percentages = last_n_days["mode"].value_counts(normalize=True) * 100
     print(percentages)
 
+def trips_under_mile(trips: pd.DataFrame):
+    """Returns a dataframe with only trips under 1 mile"""
+    return trips[trips["distance"] < 1609.34]
+
+def percent_under_mile(trips: pd.DataFrame):
+    """Prints the proportion of trips that were under 1 mile"""
+    under_a_mile = trips_under_mile(trips).shape[0]
+    total_rows = trips.shape[0]
+    percentage = (under_a_mile / total_rows) * 100
+    print(f"{percentage:.1f}% of trips were under a mile")
+
 if __name__ == "__main__":
     data_path = os.path.join("./output", SCENARIO, f"run {RUN}.csv")
     df = pd.read_csv(data_path)
-    graph_daily_share(df)
     final_n_days_share(df, 5)
+    final_n_days_share(trips_under_mile(df), 5)
+    percent_under_mile(df)
+    graph_daily_share(df)

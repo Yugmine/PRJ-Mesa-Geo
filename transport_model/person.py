@@ -103,6 +103,7 @@ class PersonAgent(mg.GeoAgent):
     person              The person this agent is representing.
     trip                This person's next planned trip.
     route               This person's current route (None if not travelling).
+    route_distance      Total length (in metres) of the route this person's route.
     location            This person's current location (None if travelling).
     memory_entry        The current memory being built.
                         (This memory remembers information about the current trip).
@@ -110,6 +111,7 @@ class PersonAgent(mg.GeoAgent):
     person: Person
     trip: Trip
     route: Route
+    route_distance: float
     location: str
     memory_entry: MemoryEntry
 
@@ -136,6 +138,7 @@ class PersonAgent(mg.GeoAgent):
         """Clears information stored when travelling"""
         self.trip = None
         self.route = None
+        self.route_distance = 0.0
         self.memory_entry = None
 
     def _mode_possible_routes(self, origin: str, destination: str, mode: str) -> list[Route]:
@@ -241,6 +244,8 @@ class PersonAgent(mg.GeoAgent):
         start_coords = network.get_node_coords(self.route.path[0])
         self._set_position(start_coords)
 
+        self.route_distance = network.get_path_distance(self.route.path)
+
         # Give negative offset if we start moving in the middle of a time step
         time_to_start = self.model.time.time_to(self.trip.start_time)
         self.route.set_offset(self.model.time_step - time_to_start)
@@ -344,6 +349,7 @@ class PersonAgent(mg.GeoAgent):
         else:
             # We've wrapped over to a new day
             start_day = end_day - 1
+        network = self.model.get_network(self.route.mode)
         row = {
             "agent_name": self.person.name,
             "origin": self.trip.origin,
@@ -355,7 +361,8 @@ class PersonAgent(mg.GeoAgent):
             "end_hour": end_time.hour,
             "end_minute": end_time.minute,
             "travel_time": trip_time,
-            "mode": self.route.mode
+            "mode": self.route.mode,
+            "distance": self.route_distance
         }
         self.model.datacollector.add_table_row("journeys", row)
 

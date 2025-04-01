@@ -4,7 +4,7 @@
         "home": "House 0",
         "description": "Alice works at 'Costa' from 08:30 to 17:00. She enjoys her daily routine and often grabs a coffee before starting her shift.",
         "owns_car": true,
-        "owns_bike": true,
+        "owns_bike": false,
         "walk_speed": 4.7,
         "bike_speed": 14.5
     },
@@ -21,8 +21,8 @@
         "name": "Sophie Davis",
         "home": "House 2",
         "description": "Sophie works at 'Deli Di Luca' from 10:00 to 18:00. She loves preparing fresh sandwiches and meeting new customers.",
-        "owns_car": false,
-        "owns_bike": true,
+        "owns_car": true,
+        "owns_bike": false,
         "walk_speed": 4.8,
         "bike_speed": 16.0
     },
@@ -57,7 +57,7 @@
         "name": "Emily Harris",
         "home": "House 6",
         "description": "Emily works at 'Squerryes Winery' from 11:00 to 19:00. She enjoys giving wine tours and tastings to visitors.",
-        "owns_car": false,
+        "owns_car": true,
         "owns_bike": true,
         "walk_speed": 4.4,
         "bike_speed": 15.5
@@ -120,8 +120,8 @@
         "name": "Isabella Nelson",
         "home": "House 13",
         "description": "Isabella is a cashier at 'Spar', working from 07:00 to 15:00. She enjoys chatting with the morning customers.",
-        "owns_car": false,
-        "owns_bike": true,
+        "owns_car": true,
+        "owns_bike": false,
         "walk_speed": 4.5,
         "bike_speed": 15.2
     },
@@ -147,8 +147,8 @@
         "name": "Jack Stewart",
         "home": "House 16",
         "description": "Jack is a bike mechanic at 'Westerham Cyclery' and works from 10:00 to 18:00.",
-        "owns_car": false,
-        "owns_bike": true,
+        "owns_car": true,
+        "owns_bike": false,
         "walk_speed": 4.2,
         "bike_speed": 15.5
     },
@@ -166,7 +166,7 @@
         "home": "House 18",
         "description": "Matthew is a chef at 'The Old Bank', working from 15:00 to 23:00. He specializes in steak dishes.",
         "owns_car": true,
-        "owns_bike": true,
+        "owns_bike": false,
         "walk_speed": 4.5,
         "bike_speed": 14.7
     },
@@ -220,7 +220,7 @@
         "home": "House 24",
         "description": "Joshua is a postal worker at 'Westerham Post Office', working from 07:00 to 15:00. He ensures mail is delivered efficiently.",
         "owns_car": false,
-        "owns_bike": true,
+        "owns_bike": false,
         "walk_speed": 4.5,
         "bike_speed": 15.5
     },
@@ -246,7 +246,7 @@
         "name": "Zoe Phillips",
         "home": "House 27",
         "description": "Zoe is a tour guide at 'Squerryes Winery', working from 10:00 to 18:00. She enjoys leading wine tastings and vineyard tours.",
-        "owns_car": false,
+        "owns_car": true,
         "owns_bike": true,
         "walk_speed": 4.7,
         "bike_speed": 15.2

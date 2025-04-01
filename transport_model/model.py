@@ -118,7 +118,8 @@ class TransportModel(mesa.Model):
                     "end_hour",
                     "end_minute",
                     "travel_time",
-                    "mode"
+                    "mode",
+                    "distance"
                 ]
             }
         )
@@ -228,7 +229,6 @@ class TransportModel(mesa.Model):
         return 0
 
     def step(self) -> None:
-        print(f"Model time - {self.time}", end="\r")
         if self.time.time_to(Time(4, 0)) < self.time_step:
             print(f"{strftime('%H:%M:%S', localtime())} - it's 04:00 on day {self.day}")
             if self.day == self.n_days + 1:
@@ -239,3 +239,4 @@ class TransportModel(mesa.Model):
         self.agents_by_type[PersonAgent].shuffle_do("step")
         self.datacollector.collect(self)
         self._update_clock()
+        print(f"Model time - {self.time}", end="\r")

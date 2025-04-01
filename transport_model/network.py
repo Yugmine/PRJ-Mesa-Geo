@@ -101,6 +101,14 @@ class TransportNetwork():
             total_time += self._get_edge_time(edge_info, speed)
         return total_time
 
+    def get_path_distance(self, path: list[int]) -> float:
+        """Gets the length of the provided path in metres"""
+        total_distance = 0
+        for i in range(len(path) - 1):
+            edge_info = self.edge_info(path[i], path[i + 1])
+            total_distance += edge_info["length"]
+        return total_distance
+
     def get_nearest_node(self, coords: tuple[float, float]) -> int:
         """Gets the id of the nearest node in the road network to the provided point"""
         node_index = self.kd_tree.query([coords], k=1, return_distance=False)
