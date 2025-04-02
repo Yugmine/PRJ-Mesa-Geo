@@ -1,6 +1,13 @@
-# pylint: skip-file
-# Code taken from Mesa-Geo 0.9.0
-# Modified at the end to add an on_click callback to markers
+"""
+Unless otherwise stated, all code in this file was NOT implemented by George Taylor.
+The original code comes from the Mesa-Geo project: https://github.com/projectmesa/mesa-geo
+
+The code was modified to add an on_click callback to markers.
+
+At the end of this file, a small amount of code has been implemented by George Taylor.
+Where this is the case has been made clear with comments.
+These comments can be found using Ctrl + F and searching for 'George Taylor'.
+"""
 
 import dataclasses
 import warnings
@@ -292,6 +299,7 @@ class MapModule:
                     # for some reason points are reversed
                     location = (location["coordinates"][1], location["coordinates"][0])
                     marker = self._get_marker(location, properties)
+                    # The following line was implemented by George Taylor
                     marker.on_click(partial(click_callback, model=model, agent=agent))
                     point_markers.append(marker)
                 else:
@@ -311,5 +319,9 @@ class MapModule:
         return [feature_collection, point_markers]
 
 def click_callback(model, agent, **kwargs):
-    """Changes the curently selected agent to the one that was clicked"""
+    """
+    This function was implemented by George Taylor
+
+    Changes the curently selected agent to the one that was clicked
+    """
     model.selected_agent = agent

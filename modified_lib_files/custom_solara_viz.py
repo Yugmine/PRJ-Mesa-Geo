@@ -1,6 +1,12 @@
-# pylint: skip-file
-# Code taken from Mesa 3.1.3
-# Grid layout edited so that components can't be dragged (as it conflicts with map dragging)
+"""
+Unless otherwise stated, all code in this file was NOT implemented by George Taylor.
+The original code comes from the Mesa project: https://github.com/projectmesa/mesa
+
+This file was edited to change the grid in the visualisation to not be draggable.
+
+A single line has been edited by George Taylor.
+This line has been made marked with a comment on line 199.
+"""
 
 """Mesa visualization module for creating interactive model visualizations.
 
@@ -190,6 +196,7 @@ def ComponentsView(
     items = [component(model) for component in wrapped_components]
     grid_layout_initial = make_initial_grid_layout(num_components=len(items))
     grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
+    # The following line was modified by George Taylor
     solara.GridDraggable(
         items=items,
         grid_layout=grid_layout,
