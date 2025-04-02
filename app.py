@@ -2,7 +2,7 @@
 from mesa import Agent
 from mesa.visualization import make_plot_component
 from transport_model.model import TransportModel
-from transport_model.geo_agents import Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from transport_model.geo_agents import NetworkLink, Area, ResidentialArea, RetailArea, IndustrialArea
 from transport_model.person import PersonAgent
 from utils.viz_components import info_panel
 from modified_lib_files.custom_geospace_component import make_geospace_component
@@ -17,7 +17,7 @@ def draw(agent: Agent) -> dict:
             portrayal["color"] = "brown"
         else:
             portrayal["color"] = "red"
-    elif isinstance(agent, Road):
+    elif isinstance(agent, NetworkLink):
         if hasattr(agent, "extra_info") and isinstance(agent.extra_info, str):
             portrayal["color"] = "yellow"
         else:

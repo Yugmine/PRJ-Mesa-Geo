@@ -53,8 +53,8 @@ def get_mean_comfort(road_type: RoadType, agent_prompts: dict[str, str]) -> floa
 if __name__ == "__main__":
     scenario_path = "./scenarios/westerham"
     road = RoadType(
-        highway = "primary",
-        maxspeed = "30 mph",
+        highway = "trunk",
+        maxspeed = "40 mph",
         info = "n/a"
     )
     prompts = get_system_prompts(scenario_path)

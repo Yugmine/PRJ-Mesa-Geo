@@ -30,12 +30,23 @@ class Route:
     path_offset: float = 0.0
 
     def trim_path_to_node(self, node: int) -> None:
-        """Updates path to remove any nodes before the provided node"""
+        """
+        Updates path to remove any nodes before the provided node.
+        
+        Args:
+            node: The node to trim to
+                  (will become the first node in this route's path).
+        """
         index = self.path.index(node)
         self.path = self.path[index:]
 
     def set_offset(self, new_offset: float) -> None:
-        """Sets the path offset"""
+        """
+        Sets the path offset
+
+        Args:
+            new_offset: The new path offset.
+        """
         self.path_offset = new_offset
 
 @dataclass

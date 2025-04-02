@@ -1,6 +1,5 @@
 """Memory used to store the agents' past experiences with travel"""
 from dataclasses import dataclass
-from typing import override
 from transport_model.time import Time
 from .routes import RoadType
 
@@ -16,7 +15,6 @@ class ModeChoice:
     mode: str
     justification: str
 
-
 class MemoryEntry:
     """
     An entry for one route in TravelMemory.
@@ -31,9 +29,9 @@ class MemoryEntry:
         self.travel_time = 0.0
         self.count = 0
 
-    def complete_memory(self, new_time: float) -> None:
+    def update(self, new_time: float) -> None:
         """
-        Completes the use of this entry, updating the travel time average.
+        Updates the travel time average.
 
         Args:
             new_time    Time (in mins) to update the average with.
@@ -45,49 +43,24 @@ class ActiveMemoryEntry(MemoryEntry):
     """
     An entry for an active travel route in TravelMemory.
     
-    comfort             Weighted average of comfort for this route.
-    edge_comfort        Comfort values for each edge in the route.
-    lengths             The length of each edge.    
+    comfort         Weighted average of comfort for this route. 
     """
     comfort: float
-    edge_comfort: list[int]
-    lengths: list[float]
 
     def __init__(self) -> None:
         self.comfort = 0.0
-        self._clear_temp_vars()
         super().__init__()
 
-    def _clear_temp_vars(self) -> None:
+    def active_update(self, new_time: float, new_comfort: float) -> None:
         """
-        Vars used every time this route is re-used.
-        Need to be reset in between.
+        Updates the stored comfort average before calling the superclass update method.
+
+        Args:
+            new_time: Time (in mins) to update the average with.
+            comfort: Comfort value to update the average with.
         """
-        self.edge_comfort = []
-        self.lengths = []
-
-    def _compute_comfort_average(self) -> float:
-        """Computes an average comfort value weighted by edge length."""
-        total_length = sum(self.lengths)
-        weighted_comfort = []
-        for i, comfort_val in enumerate(self.edge_comfort):
-            weighted_val = comfort_val * (self.lengths[i] / total_length)
-            weighted_comfort.append(weighted_val)
-        return sum(weighted_comfort)
-
-    def add_comfort(self, comfort_val: int, length: float) -> None:
-        """Adds a comfort value to the stored list"""
-        self.edge_comfort.append(comfort_val)
-        self.lengths.append(length)
-
-    @override
-    def complete_memory(self, new_time: float) -> None:
-        """Updates the stored comfort average before calling the superclass method."""
-        new_comfort = self._compute_comfort_average()
         self.comfort = ((self.comfort * self.count) + new_comfort) / (self.count + 1)
-        self._clear_temp_vars()
-        super().complete_memory(new_time)
-
+        super().update(new_time)
 
 class TravelMemory:
     """
@@ -109,47 +82,107 @@ class TravelMemory:
         self.comfort_memory = {}
         self.justifications = []
 
+    def _create_route_entry(self, mode: str, path: list[int]) -> MemoryEntry:
+        """
+        Creates a new entry in route_memory.
+
+        Args:
+            mode: The route's mode.
+            path: The route's path.
+
+        Returns:
+            The new route entry.
+        """
+        key = (mode, tuple(path))
+        if mode in ("bike", "walk"):
+            entry = ActiveMemoryEntry()
+        else:
+            entry = MemoryEntry()
+        self.route_memory[key] = entry
+        return entry
+
     def get_route_entry(self, mode: str, path: list[int]) -> MemoryEntry | None:
         """
-        Gets the entry for the specified mode and path.
-        Returns None if it doesn't exist.
+        Args:
+            mode: The route's mode.
+            path: The route's path.
+        
+        Returns:
+            The entry for the specified mode and path
+            (returns None if it doesn't exist).
         """
         key = (mode, tuple(path))
         if key not in self.route_memory:
             return None
         return self.route_memory[key]
 
-    def init_route_entry(self, mode: str, path: list[int]) -> MemoryEntry:
+    def store_route(
+        self,
+        mode: str,
+        path: list[int],
+        travel_time: float,
+        comfort: float = None
+    ) -> None:
         """
-        Initialises a new route entry.
-        If one already exists, return it instead.
+        Stores a memory of a completed route.
+
+        Args:
+            mode: The route's mode.
+            path: The route's path.
+            travel_time: How long (in minutes) the route took to complete.
+            comfort (Optional): If it was a walking/cycling route,
+                                the average comfort of the route.
         """
-        key = (mode, tuple(path))
         entry = self.get_route_entry(mode, path)
         if entry is None:
-            if mode in ("bike", "walk"):
-                entry = ActiveMemoryEntry()
-            else:
-                entry = MemoryEntry()
-            self.route_memory[key] = entry
-        return entry
+            entry = self._create_route_entry(mode, path)
+
+        if comfort is None:
+            entry.update(travel_time)
+        else:
+            entry.active_update(travel_time, comfort)
 
     def route_is_stored(self, mode: str, path: list[int]) -> bool:
-        """Returns True if the given route is stored in memory, False otherwise"""
+        """
+        Args:
+            mode: The route's mode.
+            path: The route's path.
+        Returns:
+            True if the given route is stored in memory, False otherwise"""
         return self.get_route_entry(mode, path) is not None
 
     def store_comfort(self, road: RoadType, mode: str, comfort: int) -> None:
-        """Stores the given comfort value"""
+        """
+        Stores the given comfort value.
+        
+        Args:
+            road: The road type the comfort value was generated for.
+            mode: The transport mode.
+            comfort: The generated comfort value.
+        """
         if road not in self.comfort_memory:
             self.comfort_memory[road] = {}
         self.comfort_memory[road][mode] = comfort
 
     def get_comfort(self, road: RoadType, mode: str) -> int | None:
-        """Gets the stored comfort value for the given road type, or None"""
+        """
+        Args:
+            road: The road type.
+            mode: The transport mode.
+        
+        Returns:
+            The stored comfort value for the given road type and mode,
+            or None if it doesn't exist in memory.
+        """
         if road not in self.comfort_memory or mode not in self.comfort_memory[road]:
             return None
         return self.comfort_memory[road][mode]
 
     def store_mode_choice(self, choice: ModeChoice) -> None:
-        """Stores the given mode choice"""
+        """
+        Stores the given mode choice in memory.
+
+        Args:
+            choice: The mode choice to store.
+        """
         self.justifications.append(choice)

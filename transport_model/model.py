@@ -10,7 +10,7 @@ import osmnx as ox
 from geopandas.geodataframe import GeoDataFrame
 from networkx import MultiDiGraph
 from .time import Time
-from .geo_agents import NetworkLink, Road, Area, ResidentialArea, RetailArea, IndustrialArea
+from .geo_agents import NetworkLink, Area, ResidentialArea, RetailArea, IndustrialArea
 from .person import Person, PersonAgent
 from .network import TransportNetwork, DriveNetwork, WalkNetwork, BikeNetwork
 
@@ -92,7 +92,7 @@ class TransportModel(mesa.Model):
         self.walk_network = WalkNetwork(self._get_network("walk"))
         self.bike_network = BikeNetwork(self._get_network("bike"))
 
-        self._create_link_agents(Road, self.drive_network)
+        self._create_link_agents(self.drive_network)
 
         self._load_locations()
         self._load_people()
@@ -129,9 +129,9 @@ class TransportModel(mesa.Model):
         network_path = os.path.join(self.scenario_path, f"network_{network_type}.graphml")
         return ox.io.load_graphml(network_path)
 
-    def _create_link_agents(self, link_class: type[NetworkLink], network: TransportNetwork) -> None:
+    def _create_link_agents(self, network: TransportNetwork) -> None:
         """Creates network link agents from provided network"""
-        link_creator = mg.AgentCreator(link_class, model=self)
+        link_creator = mg.AgentCreator(NetworkLink, model=self)
         links = link_creator.from_GeoDataFrame(network.get_edges_as_gdf())
         self.space.add_agents(links)
 
@@ -179,9 +179,11 @@ class TransportModel(mesa.Model):
 
     def _update_clock(self):
         """Updates the simulation clock by the specified time step"""
-        new_day = self.time.perform_time_step(self.time_step)
-        if new_day:
+        new_time = self.time.n_mins_from_now(self.time_step)
+        if new_time.hour < self.time.hour:
+            # We've rolled over to a new day
             self.day += 1
+        self.time = new_time
 
     def _get_num_files(self, path: str) -> int:
         """Gets the number of files in the provided directory"""

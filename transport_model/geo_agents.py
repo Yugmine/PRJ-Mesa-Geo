@@ -1,40 +1,31 @@
-"""Agents representing geographical features"""
-import random
+"""Agents representing geographical features in the visualisation"""
 import mesa
 import mesa_geo as mg
-from shapely import Point, Polygon, LineString
+from shapely import Polygon, LineString
 
 class NetworkLink(mg.GeoAgent):
-    """A transport link between two points (e.g. a road)"""
+    """
+    A transport link between two points (e.g. a road)
+
+    unique_id       This agent's unique ID.
+    model           The model this agent is part of.
+    geometry        A Shapely LineString object that defines this object's geometry.
+    """
     unique_id: int
     model: mesa.Model
     geometry: LineString
 
-class Road(NetworkLink):
-    """A road for cars"""
-
-# NOTE: currently unused
-class Walkway(NetworkLink):
-    """A path for pedestrians"""
-
-# NOTE: currently unused
-class Cycleway(NetworkLink):
-    """A route for cyclists"""
-
 class Area(mg.GeoAgent):
-    """Represents an OSM area"""
+    """
+    Represents an OSM area
+
+    unique_id       This agent's unique ID.
+    model           The model this agent is part of.
+    geometry        A Shapely Polygon object that defines this object's geometry.
+    """
     unique_id: int
     model: mesa.Model
     geometry: Polygon
-
-    # NOTE: currently unused
-    def get_random_point(self) -> Point:
-        """Returns a random point within this area"""
-        min_x, min_y, max_x, max_y = self.geometry.bounds
-        point = None
-        while not (point and point.within(self.geometry)):
-            point = Point(random.uniform(min_x, max_x), random.uniform(min_y, max_y))
-        return point
 
 class ResidentialArea(Area):
     """An area where people live"""

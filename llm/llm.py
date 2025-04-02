@@ -1,6 +1,7 @@
 """Handles calls to the large language model"""
 import os
 import sqlite3
+from sqlite3 import Connection, Cursor
 from openai import OpenAI
 
 client = OpenAI(
@@ -8,7 +9,18 @@ client = OpenAI(
     api_key = 'foo'
 )
 
-def query_cache(cur: sqlite3.Cursor, system_prompt: str, content: str) -> str | None:
+def create_db_connection() -> tuple[Connection, Cursor]:
+    """ 
+    Returns:
+        Connection to the cache database
+        Cursor to the database
+    """
+    con = sqlite3.connect("./llm/cache.db")
+    cur = con.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS cache (system_prompt, content, response)")
+    return con, cur
+
+def query_cache(cur: Cursor, system_prompt: str, content: str) -> str | None:
     """Queries the cache for a response to the given prompt"""
     params = (system_prompt, content)
     res = cur.execute("SELECT * FROM cache WHERE system_prompt=? AND content=?", params)
@@ -38,8 +50,7 @@ def query_llm(system_prompt: str, content: str) -> str:
 
 def generate_response(system_prompt: str, content: str) -> str:
     """Generates a response for the given prompt"""
-    con = sqlite3.connect("./llm/cache.db")
-    cur = con.cursor()
+    con, cur = create_db_connection()
     response = query_cache(cur, system_prompt, content)
     if response is None:
         response = query_llm(system_prompt, content)
@@ -54,8 +65,7 @@ def drop_cache(system_prompt: str, content: str) -> None:
     Drops the given entry from the cache,
     so that it can be re-generated on the next call.
     """
-    con = sqlite3.connect("./llm/cache.db")
-    cur = con.cursor()
+    con, cur = create_db_connection()
     params = (system_prompt, content)
     cur.execute("DELETE FROM cache WHERE system_prompt=? AND content=?", params)
     con.commit()

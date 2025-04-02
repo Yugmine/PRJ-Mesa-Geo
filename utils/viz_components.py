@@ -46,7 +46,7 @@ def agent_plan_view(agent: PersonAgent) -> solara.Details:
 def agent_mode_choice_view(agent: PersonAgent) -> solara.Details:
     """Displays justifications given for mode choices"""
     lines = []
-    for choice in agent.person.memory.justifications:
+    for choice in agent.memory.justifications:
         context = solara.Markdown((
             f"**Day {choice.day} {choice.time}  -  "
             f"{choice.origin} > {choice.destination} ({choice.mode})**"
