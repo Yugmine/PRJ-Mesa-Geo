@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 SCENARIO = "westerham"
-RUN = 17
+RUN = 0
 
 def graph_daily_share(trips: pd.DataFrame) -> None:
     """Graphs the percentage share of each mode per day"""
@@ -47,8 +47,7 @@ def count_destination_occurences(trips: pd.DataFrame, destination: str) -> float
 if __name__ == "__main__":
     data_path = os.path.join("./output", SCENARIO, f"run {RUN}.csv")
     df = pd.read_csv(data_path)
-    #final_n_days_share(df, 5)
-    #final_n_days_share(trips_under_mile(df), 5)
-    #percent_under_mile(df)
-    #graph_daily_share(df)
-    print(count_destination_occurences(df, "Costa"))
+    final_n_days_share(df, 5)
+    final_n_days_share(trips_under_mile(df), 5)
+    percent_under_mile(df)
+    graph_daily_share(df)

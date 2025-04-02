@@ -401,7 +401,12 @@ class PersonAgent(mg.GeoAgent):
     def _compute_comfort_average(self) -> float:
         """Computes an average comfort value weighted by edge length."""
         if self.route.mode == "drive":
+            # Comfort is not considered for driving.
             return None
+        if not self.edge_comfort:
+            # Sometimes the agent hasn't traversed any edges - give max comfort by default.
+            # This occurs when two locations are very close together.
+            return 10
 
         network = self.model.get_network(self.route.mode)
         total_length = network.get_path_distance(self.route.path)
