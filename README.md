@@ -1,5 +1,9 @@
 # PRJ-Mesa-Geo
 
+All work in this project is my own, with the exception of files in the `modified_lib_files` directory.
+The two files in that directory have been modified by me, George Taylor, but the majority of their code is not my original work.
+Comments in the two files make clear what is and is not my work.
+
 ## Basic Setup
 
 This model was designed on Ubuntu, and thus may not work on other operating systems.
