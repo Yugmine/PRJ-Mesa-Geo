@@ -1,7 +1,7 @@
 """Memory used to store the agents' past experiences with travel"""
 from dataclasses import dataclass
 from transport_model.time import Time
-from .routes import RoadType
+from .routes import Route, RoadType
 
 @dataclass
 class ModeChoice:
@@ -68,13 +68,13 @@ class TravelMemory:
     Memories can be used to influence planning + mode choice.
 
     route_memory        Stores memories of previous routes.
-                        Uses the form (mode, path) : entry
+                        Uses the form Route : entry
     comfort_memory      Caches comfort values generated for the given road type.
                         Uses the form RoadType: {mode: comfort}
     justifications      Stores justifications for mode choices.
     """
-    route_memory: dict[tuple[str, tuple[int, ...]], MemoryEntry]
-    comfort_memory: dict[RoadType, int]
+    route_memory: dict[Route, MemoryEntry]
+    comfort_memory: dict[RoadType, dict[str, int]]
     justifications: list[ModeChoice]
 
     def __init__(self) -> None:
@@ -82,44 +82,39 @@ class TravelMemory:
         self.comfort_memory = {}
         self.justifications = []
 
-    def _create_route_entry(self, mode: str, path: list[int]) -> MemoryEntry:
+    def _create_route_entry(self, route: Route) -> MemoryEntry:
         """
         Creates a new entry in route_memory.
 
         Args:
-            mode: The route's mode.
-            path: The route's path.
+            route: The route to create an entry for.
 
         Returns:
             The new route entry.
         """
-        key = (mode, tuple(path))
-        if mode in ("bike", "walk"):
+        if route.mode in ("bike", "walk"):
             entry = ActiveMemoryEntry()
         else:
             entry = MemoryEntry()
-        self.route_memory[key] = entry
+        self.route_memory[route] = entry
         return entry
 
-    def get_route_entry(self, mode: str, path: list[int]) -> MemoryEntry | None:
+    def get_route_entry(self, route: Route) -> MemoryEntry | None:
         """
         Args:
-            mode: The route's mode.
-            path: The route's path.
+            route: The route to get the entry for.
         
         Returns:
             The entry for the specified mode and path
             (returns None if it doesn't exist).
         """
-        key = (mode, tuple(path))
-        if key not in self.route_memory:
+        if route not in self.route_memory:
             return None
-        return self.route_memory[key]
+        return self.route_memory[route]
 
     def store_route(
         self,
-        mode: str,
-        path: list[int],
+        route: Route,
         travel_time: float,
         comfort: float = None
     ) -> None:
@@ -127,29 +122,27 @@ class TravelMemory:
         Stores a memory of a completed route.
 
         Args:
-            mode: The route's mode.
-            path: The route's path.
+            route: The route.
             travel_time: How long (in minutes) the route took to complete.
             comfort (Optional): If it was a walking/cycling route,
                                 the average comfort of the route.
         """
-        entry = self.get_route_entry(mode, path)
+        entry = self.get_route_entry(route)
         if entry is None:
-            entry = self._create_route_entry(mode, path)
+            entry = self._create_route_entry(route)
 
         if comfort is None:
             entry.update(travel_time)
         else:
             entry.active_update(travel_time, comfort)
 
-    def route_is_stored(self, mode: str, path: list[int]) -> bool:
+    def route_is_stored(self, route: Route) -> bool:
         """
         Args:
-            mode: The route's mode.
-            path: The route's path.
+            route: The route to check for.
         Returns:
             True if the given route is stored in memory, False otherwise"""
-        return self.get_route_entry(mode, path) is not None
+        return self.get_route_entry(route) is not None
 
     def store_comfort(self, road: RoadType, mode: str, comfort: int) -> None:
         """

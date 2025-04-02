@@ -22,32 +22,49 @@ class Route:
 
     mode                The transport mode being used for this route.
     path                List of nodes remaining in this route.
-    path_offset         When a person is following a path and is in the middle of an edge,
-                        gives how far through traversing it they are (in minutes).
     """
     mode: str
     path: list[int]
-    path_offset: float = 0.0
 
-    def trim_path_to_node(self, node: int) -> None:
+    def from_node(self, node: int) -> list[int]:
         """
-        Updates path to remove any nodes before the provided node.
-        
         Args:
-            node: The node to trim to
-                  (will become the first node in this route's path).
+            node: The first node in the returned path.
+        
+        Returns:
+            The path from the given node onwards.
         """
         index = self.path.index(node)
-        self.path = self.path[index:]
+        return self.path[index:]
 
-    def set_offset(self, new_offset: float) -> None:
+    def between_nodes(self, start: int, end: int) -> list[int]:
         """
-        Sets the path offset
-
         Args:
-            new_offset: The new path offset.
+            start: First node.
+            end: Last node
+
+        Returns:
+            The path between the two provided nodes (inclusive).
         """
-        self.path_offset = new_offset
+        start_index = self.path.index(start)
+        # +1 because list slicing excludes the last element
+        end_index = self.path.index(end) + 1
+        return self.path[start_index:end_index]
+
+    def __hash__(self):
+        return hash((self.mode, tuple(self.path)))
+
+@dataclass
+class RouteProgress:
+    """
+    Stores information about how far through traversing a route an agent is.
+
+    node        The node the agent has got up to.
+    offset      When a person is in the middle of an edge,
+                gives how far through traversing it they are (in minutes).
+    """
+    node: int
+    offset: float = 0.0
 
 @dataclass
 class RoadType:

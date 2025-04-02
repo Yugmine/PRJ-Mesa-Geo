@@ -5,7 +5,7 @@ import mesa_geo as mg
 from shapely import Point
 from llm.llm import generate_response, generate_prompt, drop_cache
 from transport_model.time import Time
-from .routes import Trip, Route, RoadType
+from .routes import Trip, Route, RouteProgress, RoadType
 from .memory import TravelMemory, ModeChoice
 
 class Person:
@@ -100,20 +100,19 @@ class PersonAgent(mg.GeoAgent):
     person              The person this agent is representing.
     trip                This person's next planned trip.
     route               This person's current route (None if not travelling).
+    route_progress      Stores how far through the current route this person is.
     location            This person's current location (None if travelling).
     memory              Stores memories of previous journeys.
-    original_path       The original path of the agent's route.
-    edge_comfort        Comfort values for every edge this agent has passed so far in its route.
-    lengths             The length of each edge this agent has passed so far in its route.
+    edge_comfort        Comfort values multiplied by edge weight for every edge this agent 
+                        has passed so far in its route. Used to calculate a weighted average.
     """
     person: Person
     trip: Trip
     route: Route
+    route_progress: RouteProgress
     location: str
     memory: TravelMemory
-    original_path: list[int]
     edge_comfort: list[int]
-    lengths: list[float]
 
     def __init__(
         self,
@@ -139,9 +138,8 @@ class PersonAgent(mg.GeoAgent):
         """Clears information stored when travelling"""
         self.trip = None
         self.route = None
-        self.original_path = []
+        self.route_progress = None
         self.edge_comfort = []
-        self.lengths = []
 
     def _mode_possible_routes(self, origin: str, destination: str, mode: str) -> list[Route]:
         """Returns a list of all routes we've taken before + 1 new one for the given mode"""
@@ -153,8 +151,9 @@ class PersonAgent(mg.GeoAgent):
         paths = network.plan_paths(origin_node, destination_node)
         routes = []
         for path in paths:
-            routes.append(Route(mode, path))
-            if not self.memory.route_is_stored(mode, path):
+            new_route = Route(mode, path)
+            routes.append(new_route)
+            if not self.memory.route_is_stored(new_route):
                 break
         return routes
 
@@ -172,7 +171,7 @@ class PersonAgent(mg.GeoAgent):
         Gets a string description of the given route.
         Includes information from any stored memories.
         """
-        route_memory = self.memory.get_route_entry(route.mode, route.path)
+        route_memory = self.memory.get_route_entry(route)
 
         if route_memory is None:
             network = self.model.get_network(route.mode)
@@ -240,6 +239,7 @@ class PersonAgent(mg.GeoAgent):
     def _plan_route(self) -> None:
         """Plan a route for the planned trip."""
         self.route = self._choose_a_route(self.trip.origin, self.trip.destination)
+        self.route_progress = RouteProgress(self.route.path[0])
 
         # Move the agent to the start node
         network = self.model.get_network(self.route.mode)
@@ -248,9 +248,7 @@ class PersonAgent(mg.GeoAgent):
 
         # Give negative offset if we start moving in the middle of a time step
         time_to_start = self.model.time.time_to(self.trip.start_time)
-        self.route.set_offset(self.model.time_step - time_to_start)
-
-        self.original_path = self.route.path
+        self.route_progress.offset = self.model.time_step - time_to_start
 
     def _get_speed(self, mode: str) -> float:
         """
@@ -312,12 +310,12 @@ class PersonAgent(mg.GeoAgent):
         response = generate_response(system_prompt, prompt)
         return int(response)
 
-    def _remember_comfort(self, old_path: list[int]) -> None:
+    def _remember_comfort(self, start_node: int) -> None:
         """
         Generates and stores comfort values for the edges we just traversed.
 
         Args:
-            old_path        The route path before we moved.
+            start_node        The start node of the edge the agent started this time step on.
         """
         if self.route.mode == "drive":
             # Comfort for driving assumed to be invariable.
@@ -325,8 +323,7 @@ class PersonAgent(mg.GeoAgent):
 
         network = self.model.get_network(self.route.mode)
         # Get the nodes of the edges we've traversed
-        nodes = [node for node in old_path if node not in self.route.path]
-        nodes.append(self.route.path[0])
+        nodes = self.route.between_nodes(start_node, self.route_progress.node)
 
         # For every edge, store a comfort value
         for i in range(len(nodes) - 1):
@@ -337,20 +334,41 @@ class PersonAgent(mg.GeoAgent):
                 comfort = self._get_comfort(road, self.route.mode)
                 self.memory.store_comfort(road, self.route.mode, comfort)
             length = edge_info["length"]
-            self.edge_comfort.append(comfort)
-            self.lengths.append(length)
+            self.edge_comfort.append(comfort * length)
 
-    def _record_journey(self, trip_time: float) -> None:
-        """Records the journey that just finished in the model datacollector"""
+    def _get_start_day(self, start_time: Time, end_time: Time, end_day: int) -> int:
+        """
+        Args:
+            start_time: The time the trip started.
+            end_time: The time the trip ended.
+            end_day: The day the trip ended on.
+        
+        Returns:
+            The day which the trip started on.
+        """
+        if end_time.hour < start_time.hour:
+            # We've wrapped over to a new day
+            return end_day - 1
+        return end_day
+
+    def _prepare_row(self, trip_time: float) -> dict[str, any]:
+        """
+        Prepares a row with information about the trip that just ended
+        to be stored in the model datacollector.
+
+        Args:
+            trip_time: How long the trip that just finished took.
+        
+        Returns:
+            The prepared row.
+        """
         start_time = self.trip.start_time
         end_time = start_time.n_mins_from_now(trip_time)
         end_day = self.model.day
-        if end_time.hour >= start_time.hour:
-            start_day = end_day
-        else:
-            # We've wrapped over to a new day
-            start_day = end_day - 1
-        row = {
+        start_day = self._get_start_day(start_time, end_time, end_day)
+        network = self.model.get_network(self.route.mode)
+        distance = network.get_path_distance(self.route.path)
+        return {
             "agent_name": self.person.name,
             "origin": self.trip.origin,
             "destination": self.trip.destination,
@@ -362,8 +380,22 @@ class PersonAgent(mg.GeoAgent):
             "end_minute": end_time.minute,
             "travel_time": trip_time,
             "mode": self.route.mode,
-            "distance": sum(self.lengths)
+            "distance": distance
         }
+
+    def _record_journey(self, mins_left: float) -> None:
+        """
+        Records the journey that just finished in route 
+        memory and the model datacollector.
+
+        Args:
+            mins_left: How many minutes are left in this time step
+                       after the agent finished travelling.
+        """
+        trip_time = self._calculate_trip_time(mins_left)
+        comfort = self._compute_comfort_average()
+        self.memory.store_route(self.route, trip_time, comfort)
+        row = self._prepare_row(trip_time)
         self.model.datacollector.add_table_row("journeys", row)
 
     def _compute_comfort_average(self) -> float:
@@ -371,36 +403,32 @@ class PersonAgent(mg.GeoAgent):
         if self.route.mode == "drive":
             return None
 
-        total_length = sum(self.lengths)
-        weighted_comfort = []
-        for i, comfort_val in enumerate(self.edge_comfort):
-            weighted_val = comfort_val * (self.lengths[i] / total_length)
-            weighted_comfort.append(weighted_val)
-        return sum(weighted_comfort)
+        network = self.model.get_network(self.route.mode)
+        total_length = network.get_path_distance(self.route.path)
+
+        return sum(self.edge_comfort) / total_length
 
     def _follow_route(self) -> None:
         """Move along the planned route"""
         network = self.model.get_network(self.route.mode)
         speed = self._get_speed(self.route.mode)
 
-        old_path = self.route.path
+        start_node = self.route_progress.node
 
-        new_position, mins_left = network.traverse_route(
+        self.route_progress, new_position, mins_left = network.traverse_route(
             route = self.route,
+            progress = self.route_progress,
             time_step = self.model.time_step,
             speed = speed
         )
 
-        self._remember_comfort(old_path)
+        self._remember_comfort(start_node)
 
         if new_position is None:
             # We have reached our destination
             new_position = self.model.get_location_coords(self.trip.destination)
             self.location = self.trip.destination
-            trip_time = self._calculate_trip_time(mins_left)
-            comfort = self._compute_comfort_average()
-            self.memory.store_route(self.route.mode, self.original_path, trip_time, comfort)
-            self._record_journey(trip_time)
+            self._record_journey(mins_left)
             self._clear_travel_info()
             self._next_plan_step()
 

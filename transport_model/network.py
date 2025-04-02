@@ -7,7 +7,7 @@ import networkx as nx
 from sklearn.neighbors import KDTree
 from geopandas import GeoDataFrame
 from shapely import LineString
-from .routes import Route
+from .routes import Route, RouteProgress
 
 @dataclass
 class Edge:
@@ -21,7 +21,13 @@ class Edge:
     v: int
 
 class TransportNetwork():
-    """Represents a transport network"""
+    """
+    Represents a transport network
+    
+    graph       The graph that represents the transport network.
+    kd_tree     A KDTree initialised with the positions of nodes in the graph.
+                Used to find the nearest node to a given point.
+    """
     graph: nx.MultiDiGraph
     kd_tree: KDTree
 
@@ -37,14 +43,17 @@ class TransportNetwork():
             speed: float = None
         ) -> tuple[Edge, float, float]:
         """
-        Gets which edge we'll end up on after moving for the specified amount
-        of time (in minutes), and how far through traversing it we are.
+        Gets the edge we'll end up on after traversing the given path.
+
+        Args:
+            path: The path to traverse.
+            time: How many minutes to traverse the path for.
+            speed: (For walking or cycling), the speed to traverse the path at.
 
         Returns:
-        - Edge start node
-        - Edge end node
-        - Edge traversal time (in minutes)
-        - How far through traversing the edge we are (in minutes)
+            Final Edge.
+            Edge traversal time (in minutes).
+            How far through traversing the edge we are (in minutes).
         """
         cumulative_time = 0
         for i in range(len(path) - 1):
@@ -57,15 +66,25 @@ class TransportNetwork():
         return None
 
     def _create_line(self, edge: Edge) -> LineString:
-        """Creates a Shapely LineString for the provided edge"""
+        """
+        Args:
+            edge: The edge to create a LineString for
+
+        Returns:
+            A LineString between the edge's start and end nodes.
+        """
         start_pos = self.get_node_coords(edge.u)
         end_pos = self.get_node_coords(edge.v)
         return LineString([start_pos, end_pos])
 
     def _get_edge_geometry(self, edge: Edge) -> LineString:
         """
-        Gets the edge geometry for the provided edge,
-        or creates a line if it doesn't have any set geometry.
+        Args:
+            edge: The edge to get geometry for.
+        
+        Returns:
+            The edge's geometry if it has set geometry, or a
+            straight line between its start and end nodes.
         """
         edge_data = self.edge_info(edge.u, edge.v)
 
@@ -80,9 +99,13 @@ class TransportNetwork():
             progress: float
         ) -> tuple[float, float]:
         """
-        Gets a point along the provided edge.
-        progress is how far along the edge the point should be.
-        e.g. if progress = 0.4, the point should be 40% along the edge.
+        Args:
+            edge: The edge to get a point on.
+            progress: A proportion along the edge to get a point for.
+                      e.g. if progress = 0.4, the point should be 40% along the edge.
+        
+        Returns:
+            An (x, y) coordinate the specified proportion along the edge.
         """
         geometry = self._get_edge_geometry(edge)
         interpolation_dist =  progress * geometry.length
@@ -91,9 +114,12 @@ class TransportNetwork():
 
     def get_path_duration(self, path: list[int], speed: float = None) -> float:
         """
-        Gets the length of the provided path (in minutes)
+        Args:
+            path: The path to get a duration for.
+            speed: (Only for walking and cycling) the agent's speed.
         
-        speed is optional and only used for walking + cycling
+        Returns:
+            How long it takes to traverse the given path (in minutes).
         """
         total_time = 0
         for i in range(len(path) - 1):
@@ -101,70 +127,124 @@ class TransportNetwork():
             total_time += self._get_edge_time(edge_info, speed)
         return total_time
 
+    def get_path_distance(self, path: list[int]) -> float:
+        """
+        Args:
+            path: The path to get a distance for.
+        
+        Returns:
+            The length of the path in metres.
+        """
+        total_distance = 0
+        for i in range(len(path) - 1):
+            edge_info = self.edge_info(path[i], path[i + 1])
+            total_distance += edge_info["length"]
+        return total_distance
+
     def get_nearest_node(self, coords: tuple[float, float]) -> int:
-        """Gets the id of the nearest node in the road network to the provided point"""
+        """
+        Args:
+            coords: The coords to search for a node near.
+
+        Returns:
+            The ID of the nearest node in the graph to the provided coords.
+        """
         node_index = self.kd_tree.query([coords], k=1, return_distance=False)
         node_id = list(self.graph.nodes)[node_index[0,0]]
         return node_id
 
     def get_node_coords(self, node_id: int) -> tuple[float, float]:
-        """Gets the coordinates of the specified node"""
+        """
+        Args:
+            node_id: The ID of the node to get coordinates for.
+        
+        Returns:
+            The (x, y) coordinates of the node.
+        """
         return self.graph.nodes[node_id]["x"], self.graph.nodes[node_id]["y"]
 
     def get_edges_as_gdf(self) -> GeoDataFrame:
-        """Returns a gdf with the edges of this network's graph"""
+        """
+        Returns:
+            A GeoDataFrame with the edges of this network's graph
+        """
         gdfs = ox.convert.graph_to_gdfs(self.graph) # tuple w/ format (nodes, edges)
         return gdfs[1]
 
     def traverse_route(
             self,
             route: Route,
+            progress: RouteProgress,
             time_step: int,
             speed: float = None
-        ) -> tuple[tuple[float, float], float]:
+        ) -> tuple[RouteProgress, tuple[float, float] | None, float]:
         """
         Traverses the provided route.
 
-        speed is optional and only used when calculating edge time for walking + cycling
+        Args:
+            route: The route to traverse.
+            progress: How far through traversing the route the agent is.
+            time_step: How much time passes with each model time step (in minutes).
+            speed: (Only for walking and cycling) the speed to traverse the route at.
 
         Returns:
-        -   New location for the agent (None if route is complete)
-        -   Remaining time in the step
-            (e.g. if step is 5 mins and it only needs to move for
-            3 mins to finish, return 2 mins)
+            Agent's new progress through the route.
+            New location for the agent (None if route is complete).
+            Remaining time in the step (in minutes).
+            (e.g. if step is 5 mins and agent only needs to move for
+            3 mins to finish, return 2)
         """
-        path_time = self.get_path_duration(route.path, speed)
-        traversal_time = time_step + route.path_offset
+        remaining_path = route.from_node(progress.node)
+        path_time = self.get_path_duration(remaining_path, speed)
+        traversal_time = time_step + progress.offset
 
         if traversal_time > path_time:
             # Route completed
-            route.trim_path_to_node(route.path[-1])
             time_left = traversal_time - path_time
-            return None, time_left
+            return RouteProgress(route.path[-1]), None, time_left
 
-        edge, edge_time, new_offset = self._get_final_edge(route.path, traversal_time, speed)
-        route.trim_path_to_node(edge.u)
-        route.set_offset(new_offset)
+        edge, edge_time, new_offset = self._get_final_edge(remaining_path, traversal_time, speed)
+        new_progress = RouteProgress(edge.u, new_offset)
 
-        progress = new_offset / edge_time
-        new_location = self._get_point_along_edge(edge, progress)
-        return new_location, 0.0
+        edge_progress = new_offset / edge_time
+        new_location = self._get_point_along_edge(edge, edge_progress)
+        return new_progress, new_location, 0.0
 
     def edge_info(self, edge_u, edge_v) -> dict:
-        """Gets information for the provided edge"""
+        """
+        Args:
+            edge_u: The start node of the edge.
+            edge_v: The end node fo the edge.
+        Returns:
+            The info dict for the provided edge.
+        """
         return self.graph.get_edge_data(edge_u, edge_v)[0]
 
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
-        """Get the time taken to traverse the given edge"""
+        """
+        Args:
+            attrs: The info dict of the edge to traverse.
+            speed: (Only for walking and cycling) The speed to traverse the edge at.
+        
+        Returns:
+            The time taken to traverse the given edge.
+        """
         raise NotImplementedError("Implemented in subclass")
 
     def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
-        """Returns an iterator of paths from the source node to the target node"""
+        """
+        Args:
+            source: The start node.
+            target: The end node.
+        
+        Returns:
+            an iterator of shortest paths from the source node to the target node.
+        """
         raise NotImplementedError("Implemented in subclass")
 
 class DriveNetwork(TransportNetwork):
     """
-    Network for driving
+    Network for driving.
     
     default_limit       The speed limit (in km/h) applied to roads with no defined speed limit.
     speed_factor        Multiplied by speed limit to get the speed a car will travel at.
@@ -184,8 +264,11 @@ class DriveNetwork(TransportNetwork):
 
     def _get_num_limit(self, limit: str) -> float:
         """
-        Converts the provided speed limit to a number in km/h
-        Expected limit format e.g. '20 mph'
+        Args:
+            limit: A string speed limit (e.g. '20 mph').
+        
+        Returns:
+            The speed limit in km/h as a float.
         """
         parts = limit.split()
         speed = int(parts[0])
@@ -194,7 +277,13 @@ class DriveNetwork(TransportNetwork):
         return speed
 
     def _get_speed_limit(self, attrs: dict) -> float:
-        """Extracts the speed limit from the provided attribute dict"""
+        """
+        Args:
+            attrs: An edge attributes dictionary
+        
+        Returns:
+            The speed limit of the edge in km/h.
+        """
         if "maxspeed" not in attrs:
             return self.default_limit
 
@@ -207,16 +296,21 @@ class DriveNetwork(TransportNetwork):
         return self._get_num_limit(limit)
 
     def _weight_func(self, u: int, v: int, attrs: dict) -> float:
-        """Wrapper to match expected function signature for weight function"""
+        """
+        Wrapper to match expected function signature for weight function.
+        Used for NetworkX shortest path calculations only.
+        """
         return self._get_edge_time(attrs)
 
     @override
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """
-        Calculates how long (in minutes) it would take to traverse
-        a link travelling at the speed limit.
-
-        speed is not used in this function (speed is calculated based on the speed limit)
+        Args:
+            attrs: The info dict of the edge to traverse.
+            speed: Unused.
+        
+        Returns:
+            The time taken to traverse the given edge.
         """
         speed_limit = self._get_speed_limit(attrs)
         car_speed = speed_limit * self.speed_factor
@@ -224,31 +318,49 @@ class DriveNetwork(TransportNetwork):
 
     @override
     def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
-        """Returns an iterator of paths from the source node to the target node"""
+        """
+        Args:
+            source: The start node.
+            target: The end node.
+        
+        Returns:
+            an iterator of shortest paths from the source node to the target node.
+        """
         digraph = ox.convert.to_digraph(self.graph)
         paths = nx.shortest_simple_paths(digraph, source, target, weight=self._weight_func)
         return paths
 
 class ActiveNetwork(TransportNetwork):
-    """Network for active travel (walking + cycling)"""
+    """Network for active travel (walking and cycling)."""
 
     @override
     def _get_edge_time(self, attrs: dict, speed: float = None) -> float:
         """
-        Calculates how long (in minutes) it would take to traverse
-        a link travelling at the given speed
+        Args:
+            attrs: The info dict of the edge to traverse.
+            speed: The speed to traverse the edge at.
+        
+        Returns:
+            The time taken to traverse the given edge.
         """
         return ((attrs["length"] / 1000) / speed) * 60
 
     @override
     def plan_paths(self, source: int, target: int) -> Iterator[list[int]]:
-        """Returns an iterator of paths from the source node to the target node"""
+        """
+        Args:
+            source: The start node.
+            target: The end node.
+        
+        Returns:
+            an iterator of shortest paths from the source node to the target node.
+        """
         digraph = ox.convert.to_digraph(self.graph)
         paths = nx.shortest_simple_paths(digraph, source, target, weight="length")
         return paths
 
 class WalkNetwork(ActiveNetwork):
-    """Network for walking"""
+    """Network for walking."""
 
 class BikeNetwork(ActiveNetwork):
-    """Network for cycling"""
+    """Network for cycling."""
