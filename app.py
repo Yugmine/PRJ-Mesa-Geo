@@ -47,7 +47,14 @@ model_params = {
     },
     "default_speed_limit": 30,
     "car_speed_factor": 0.75,
-    "n_days": 10,
+    "n_days": {
+        "type": "SliderInt",
+        "value": 10,
+        "label": "Simulation length (days):",
+        "min": 1,
+        "max": 20,
+        "step": 1,
+    },
     "driving_extra_time": 5,
     "cycling_extra_time": 5
 }
@@ -57,7 +64,7 @@ transport_model = TransportModel(
     model_params["time_step"]["value"],
     model_params["default_speed_limit"],
     model_params["car_speed_factor"],
-    model_params["n_days"],
+    model_params["n_days"]["value"],
     model_params["driving_extra_time"],
     model_params["cycling_extra_time"]
 )

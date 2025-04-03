@@ -11,7 +11,7 @@
     {
         "name": "James Carter",
         "home": "House 1",
-        "description": "James is a barista at 'The George and Dragon'. His work hours are from 07:00 to 15:00, and he enjoys chatting with regulars.",
+        "description": "James is a barkeep at 'The George and Dragon'. His work hours are from 07:00 to 15:00, and he enjoys chatting with regulars.",
         "owns_car": true,
         "owns_bike": false,
         "walk_speed": 4.2,
@@ -92,7 +92,7 @@
     {
         "name": "Grace Lewis",
         "home": "House 10",
-        "description": "Grace works at 'Manuka' from 09:30 to 17:30. She loves selling organic food and skincare products to the community.",
+        "description": "Grace works at 'Manuka' from 09:30 to 17:30. She loves selling shoes to the community.",
         "owns_car": true,
         "owns_bike": true,
         "walk_speed": 4.5,
@@ -101,7 +101,7 @@
     {
         "name": "Michael Moore",
         "home": "House 11",
-        "description": "Michael is a mechanic at 'General Wolfe' and works from 08:00 to 16:00. He specializes in car repairs and maintenance.",
+        "description": "Michael is a barkeep at 'General Wolfe' and works from 08:00 to 16:00. He specializes in preparing cocktails.",
         "owns_car": true,
         "owns_bike": false,
         "walk_speed": 4.2,
@@ -110,7 +110,7 @@
     {
         "name": "Ethan Mitchell",
         "home": "House 12",
-        "description": "Ethan works at 'Rendezvous' from 12:00 to 20:00. He enjoys crafting unique cocktails for customers.",
+        "description": "Ethan works at 'Rendezvous' from 12:00 to 20:00. He enjoys crafting unique dishes for customers.",
         "owns_car": true,
         "owns_bike": false,
         "walk_speed": 4.3,
@@ -137,7 +137,7 @@
     {
         "name": "Mia Robinson",
         "home": "House 15",
-        "description": "Mia is a florist at 'Larratt & Co', working from 09:00 to 17:30. She loves arranging flowers for customers.",
+        "description": "Mia is a butcher at 'Larratt & Co', working from 09:00 to 17:30. She loves serving customers.",
         "owns_car": true,
         "owns_bike": false,
         "walk_speed": 4.6,
@@ -155,7 +155,7 @@
     {
         "name": "Sophia Turner",
         "home": "House 17",
-        "description": "Sophia is a librarian at 'Westerham Hall' and works from 09:00 to 17:00. She enjoys organizing reading events.",
+        "description": "Sophia works at 'Westerham Hall' and works from 09:00 to 17:00. She enjoys helping her local community.",
         "owns_car": true,
         "owns_bike": false,
         "walk_speed": 4.3,
@@ -173,7 +173,7 @@
     {
         "name": "Ava Wright",
         "home": "House 19",
-        "description": "Ava is a yoga instructor at 'All About U', working from 07:30 to 14:30. She enjoys promoting healthy living.",
+        "description": "Ava is a hair stylist at 'All About U', working from 07:30 to 14:30. She enjoys helping customers.",
         "owns_car": false,
         "owns_bike": true,
         "walk_speed": 4.8,
@@ -200,7 +200,7 @@
     {
         "name": "Ryan Cooper",
         "home": "House 22",
-        "description": "Ryan is a butcher at 'Food For Thought', working from 06:00 to 14:00. He enjoys preparing fresh cuts of meat for customers.",
+        "description": "Ryan is a barista at 'Food For Thought', working from 06:00 to 14:00. He enjoys preparing fresh cups of coffee for customers.",
         "owns_car": true,
         "owns_bike": false,
         "walk_speed": 4.4,
@@ -236,7 +236,7 @@
     {
         "name": "Nathan Morgan",
         "home": "House 26",
-        "description": "Nathan is a historian at 'St Mary the Virgin', working from 09:00 to 17:00. He enjoys sharing historical knowledge with visitors.",
+        "description": "Nathan is a vicar at 'St Mary the Virgin', working from 09:00 to 17:00. He enjoys sharing historical knowledge with visitors.",
         "owns_car": true,
         "owns_bike": true,
         "walk_speed": 4.4,
@@ -254,7 +254,7 @@
     {
         "name": "Elliot Hughes",
         "home": "House 28",
-        "description": "Elliot is an accountant at 'The Old Bank', working from 09:00 to 17:30. He helps clients manage their finances.",
+        "description": "Elliot is an waiter at 'The Old Bank', working from 09:00 to 17:30. He makes sure customers enjoy their meal.",
         "owns_car": true,
         "owns_bike": false,
         "walk_speed": 4.2,
@@ -272,7 +272,7 @@
     {
         "name": "Oscar Bennett",
         "home": "House 30",
-        "description": "Oscar is a gym trainer at 'All About U', working from 06:30 to 14:30. He enjoys helping people achieve their fitness goals.",
+        "description": "Oscar is a stylist at 'All About U', working from 06:30 to 14:30. He enjoys helping people look their best.",
         "owns_car": false,
         "owns_bike": true,
         "walk_speed": 4.8,

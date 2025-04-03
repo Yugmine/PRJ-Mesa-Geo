@@ -6,9 +6,10 @@ This file was edited to change the grid in the visualisation to not be draggable
 
 A single line has been edited by George Taylor.
 This line has been made marked with a comment on line 199.
-"""
 
-"""Mesa visualization module for creating interactive model visualizations.
+The original file continues here:
+
+Mesa visualization module for creating interactive model visualizations.
 
 This module provides components to create browser- and Jupyter notebook-based visualizations of
 Mesa models, allowing users to watch models run step-by-step and interact with model parameters.
